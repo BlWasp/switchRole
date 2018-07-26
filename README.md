@@ -11,6 +11,9 @@ Intro
 
 This code implements a role based approach for distributing Linux capabilities into Linux users. It allows assigning Linux capabilities to Linux users without the need to inject the Linux capabilities into executable files. Our code is a PAM-based module that leverages a new capability set added to Linux kernel, called Ambient Set. Using this module, administrators can group a set of Linux capabilities in roles and give them to their users. For security reasons, users don’t get the attributed roles by default, they should activate them using the command sr (substitute role). Our module is compatible with PAM_CAP. So administrators can continue using PAM_CAP with our module.
 
+Tested Platforms
+===========
+Our module has been tested only on Ubuntu and debian platforms.
 
 Installation
 ===========
