@@ -13,7 +13,7 @@ This code implements a role based approach for distributing Linux capabilities i
 
 Tested Platforms
 ===========
-Our module has been tested only on Ubuntu and debian platforms.
+Our module has been tested only on Ubuntu and Debian platforms.
 
 Installation
 ===========
