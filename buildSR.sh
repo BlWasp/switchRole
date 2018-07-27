@@ -27,7 +27,7 @@ rm pam_moduleSR.o
 gcc -o sr srFolder/sr.c -lpam -lpam_misc -lcap -lcap-ng
 sudo setcap cap_dac_override,cap_setpcap+ep sr
 gcc -o sr_aux srFolder/sr_aux.c -lcap -lcap-ng
-sudo setcap cap_setfcap+ep /sbin/setcap
+sudo setcap cap_setfcap+ei /sbin/setcap
 
 sudo cp srFolder/sr /etc/pam.d
 sudo chmod 644 /etc/pam.d/sr
