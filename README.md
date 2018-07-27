@@ -41,6 +41,12 @@ Once configuration is done, a user can assume a role using the tool ‘sr’ tha
 
 After that a new shell is oppend that contains the capabilities in the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you exit you can retrun to your initial shell. 
 
+Motivation scenarios
+===========
+
+Scenario 1
+-----
+A user contacts his administrator to give him a privilege that allows him running an HTTP server that is developed using Python. His script needs the privilege CAP_NET_BIND_SERVICE to bind the server socket to 80 port.  Without our module, the administrator has two options: (1)  Use setcap command to inject the privilege into Python interpreter or (2) use PAM_CAP to attribute the CAP_NET_BIND_SERVICE to the user and then inject this privilege in the inheritable and effective set of the interpreter. Both solutions have security problems because in the case of option (1), the Python interpreter can be used by any another user with this privilege. In the case of option (2) other python scripts run by the user will have the same privilege.
 
 References
 ==========
