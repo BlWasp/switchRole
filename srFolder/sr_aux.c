@@ -66,13 +66,45 @@ static void add_ambient(void)
 
 int main (int argc, char *argv[])
 {
+	char *user = argv[2];
+	char *s1 = "/home/";
+	char *s2 = "/.bashrc";
+	char *result = malloc(strlen(s1) + strlen(s2) + strlen(user) + 1);
+	strcpy(result,s1);
+	strcat(result,user);
+	strcat(result,s2);
+	
+	FILE* bash = NULL;
+	bash = fopen(result,"a");
+	if (bash == NULL) {
+		perror("Open fail : .bashrc\n");
+		exit(EXIT_FAILURE);
+	}
+	fprintf(bash,"PS1=\"\\u-%s@\\h:\\W \"",argv[1]);
+	fclose(bash);
+	
 	add_ambient();
+	
+	if (fork()) {
+		while (wait(NULL) == -1 && errno == EINTR);
+		char *newargv[] = { NULL };
+		char *newenviron[] = { NULL };
+
+		newargv[0] = "scriptBash.sh";
+		newargv[1] = user;
+		newargv[2] = NULL;
+		execve(newargv[0],newargv,newenviron);
+		perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
+		exit(EXIT_FAILURE);
+		
+		exit(EXIT_SUCCESS);
+	}
 	
 	printf("bash launch\n");
 	/* Here we launch the bash with the capabilities in P, E, I and A. */
 	char *newargv[] = { NULL };
 	char *newenviron[] = { NULL };
-		
+
 	newargv[0] = "/bin/bash";
 	newargv[1] = NULL;
 	execve(newargv[0],newargv,newenviron);
