@@ -18,7 +18,7 @@ rm pam_moduleSR.o || exit
 gcc -o sr srFolder/sr.c -lpam -lpam_misc -lcap -lcap-ng || exit
 sudo setcap cap_dac_override,cap_setpcap,cap_setfcap+ep sr || exit
 gcc -o sr_aux srFolder/sr_aux.c -lcap -lcap-ng || exit
-sudo chmod 755 scriptBash.sh
+sudo chmod 755 scriptBash.sh || exit
 
 sudo cp srFolder/sr /etc/pam.d || exit
 sudo chmod 644 /etc/pam.d/sr || exit
