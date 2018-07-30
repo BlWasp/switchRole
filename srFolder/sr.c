@@ -368,7 +368,8 @@ void fork_setcap(char* user, char* role)
 		
 		newargv[0] = "./sr_aux";
 		newargv[1] = role;
-		newargv[2] = NULL;
+		newargv[2] = user;
+		newargv[3] = NULL;
 		execve(newargv[0],newargv,newenviron);
 		perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
 		exit(EXIT_FAILURE);	
@@ -457,7 +458,7 @@ int main(int argc, char *argv[])
 
 	fork_setcap(user,role);
 	
-	free(user);
+	//free(user);
 
 	exit(EXIT_SUCCESS);
 }
