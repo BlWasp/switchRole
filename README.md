@@ -50,7 +50,7 @@ A user contacts his administrator to give him a privilege that allows him runnin
 
 
 
-https://github.com/guillaumeDaumas/switchRole/blob/master/sr%20algorithm.jpg
+![Screenshot](switchRole/sr algorithm.jpg)
 
 
 
