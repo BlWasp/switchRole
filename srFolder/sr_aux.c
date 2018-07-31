@@ -110,8 +110,6 @@ int main (int argc, char *argv[])
 	execve(newargv[0],newargv,newenviron);
 	perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
 	exit(EXIT_FAILURE);
-
-	exit(EXIT_SUCCESS);
 }
 
 
