@@ -50,7 +50,7 @@ A user contacts his administrator to give him a privilege that allows him runnin
 
 
 
-![Screenshot](sr algorithm.jpg)
+![Screenshot](algorithm.jpg)
 
 
 
