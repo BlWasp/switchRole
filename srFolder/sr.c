@@ -320,9 +320,6 @@ int set_setfcap(void)
 	if (caps == NULL)
 		perror("No capabilities");
 		
-	if (cap_clear_flag(caps,CAP_INHERITABLE) == -1)
-		perror("Problem when clearing Inheritable\n");
-		
 	cap_value_t *cap_list = malloc(sizeof(cap_value_t));
 	if (cap_list == NULL)
 		perror("unable to combine capabilities into one string or set in a list - no memory\n");
@@ -344,7 +341,72 @@ int set_setfcap(void)
 	return ok;
 }
 
+int set_setpcap(void)
+{
+	cap_t caps;
+	int ok = 0;
+	char *conf_icaps;
+	
+	caps = cap_get_proc();
+	if (caps == NULL)
+		perror("No capabilities");
+		
+	if (cap_clear_flag(caps,CAP_INHERITABLE) == -1)
+		perror("Problem when clearing Inheritable\n");
+	if (cap_clear_flag(caps,CAP_EFFECTIVE) == -1)
+		perror("Problem when clearing Effective\n");
+		
+	cap_value_t *cap_list = malloc(sizeof(cap_value_t));
+	if (cap_list == NULL)
+		perror("unable to combine capabilities into one string or set in a list - no memory\n");
+	
+	/* Extract caps in string format from conf_icaps to cap_value_t format */
+	cap_from_name("cap_setpcap", &cap_list[0]);
+	
+	if (cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_SET) == -1)
+		perror("Problem with Inheritable\n");
 
+	if (cap_set_proc(caps) == -1) {
+		perror("Capabilities were not set\n");
+	} else{
+		ok = 1;
+	}
+
+	cap_free(caps);
+	free(cap_list);
+	return ok;
+}
+
+int set_dac_override(void)
+{
+	cap_t caps;
+	int ok = 0;
+	char *conf_icaps;
+	
+	caps = cap_get_proc();
+	if (caps == NULL)
+		perror("No capabilities");
+		
+	cap_value_t *cap_list = malloc(sizeof(cap_value_t));
+	if (cap_list == NULL)
+		perror("unable to combine capabilities into one string or set in a list - no memory\n");
+	
+	/* Extract caps in string format from conf_icaps to cap_value_t format */
+	cap_from_name("cap_dac_override", &cap_list[0]);
+	
+	if (cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_SET) == -1)
+		perror("Problem with Inheritable\n");
+
+	if (cap_set_proc(caps) == -1) {
+		perror("Capabilities were not set\n");
+	} else{
+		ok = 1;
+	}
+
+	cap_free(caps);
+	free(cap_list);
+	return ok;
+}
 
 
 /* We need a fork for the execve setcap. Without fork, we will lose controle on this processus after the execve */
@@ -422,7 +484,7 @@ int main(int argc, char *argv[])
 	retval = pam_setcred(pamh, 0);
 	// Are the credentials correct?
 	if (retval == PAM_SUCCESS) {
-		//printf("Credentials accepted.\n");
+		set_dac_override();
 		retval = pam_authenticate(pamh, 0);
 	}
 
@@ -449,6 +511,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 	
+	set_setpcap();
 	
 	/* child will set capabilities and launch sr_aux */
 	char *role = argv[1];
