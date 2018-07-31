@@ -16,7 +16,7 @@ sudo ld -x --shared -o /lib/x86_64-linux-gnu/security/pam_moduleSR.so pam_module
 rm pam_moduleSR.o || exit
 
 gcc -o sr srFolder/sr.c -lpam -lpam_misc -lcap -lcap-ng || exit
-sudo setcap cap_dac_override,cap_setpcap,cap_setfcap+ep sr || exit
+sudo setcap cap_dac_override,cap_setpcap,cap_setfcap+p sr || exit
 gcc -o sr_aux srFolder/sr_aux.c -lcap -lcap-ng || exit
 sudo chmod 755 scriptBash.sh || exit
 
