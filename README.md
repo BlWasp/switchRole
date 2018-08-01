@@ -52,7 +52,7 @@ How sr Works
 ===========
 You might be interested to know how we implement the sr tool. So here is the algorithm: 
 
-![Screenshot](algorithm.jpg)
+![Screenshot](algorithm1.jpg)
 
 
 
