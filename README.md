@@ -41,6 +41,14 @@ Once configuration is done, a user can assume a role using the tool ‘sr’ tha
 
 After that a new shell is oppend that contains the capabilities in the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you exit you can retrun to your initial shell. 
 
+**No Root**
+An other possibility is to launch a bash without sudo possibility. You can use this mode like this:
+
+`./sr -noroot role1`
+
+You have activated the noroot and nosuid bits and the no_new_privs bit. It's now impossible to launch a command with sudo and the setuid bit in a binary is no longer effective. For example, you can't use the ping command without a role with cap_net_raw.
+Other example : if you used `sr -noroot role` as root (with a role where root is allowed), the capabilities will drop to the match the role.
+
 Motivation scenarios
 ===========
 
