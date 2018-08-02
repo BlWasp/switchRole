@@ -57,6 +57,31 @@ Scenario 1
 -----
 A user contacts his administrator to give him a privilege that allows him running an HTTP server that is developed using Python. His script needs the privilege CAP_NET_BIND_SERVICE to bind the server socket to 80 port.  Without our module, the administrator has two options: (1)  Use setcap command to inject the privilege into Python interpreter or (2) use pam_cap.so to attribute the CAP_NET_BIND_SERVICE to the user and then inject this privilege in the inheritable and effective sets of the interpreter. Both solutions have security problems because in the case of option (1), the Python interpreter can be used by any another user with this privilege. In the case of option (2) other python scripts run by the legitimate user will have the same privilege.
 
+![Screenshot](scenarioPython/codeServer.png)
+
+Here a simple python script wich bind a server on the port 80 (this port is normally reserved for the system).
+
+![Screenshot](scenarioPython/connectionFailed.png)
+
+If we try to use it, we have the expected 'Permission denied'.
+
+![Screenshot](scenarioPython/connectionWithSetcap.png)
+
+First solution is to use to setcap command and attribute the cap_net_bind_service capability to the python interpreter. But, now all the script launch with python will have this capability.
+
+![Screenshot](scenarioPython/capabilityConf.png)
+
+Second solution is to use this module. First, you configure the capabilityRole.conf file : here I set cap_net_bind_service in the role1.
+
+![Screenshot](scenarioPython/connectionWithRole.png)
+
+Then, we launch a new bash with sr and the role1, and we can launch our script without any problem !
+
+![Screenshot](scenarioPython/proofNoCaps.png)
+
+And as we can see here, python binary doesn't have any capabilities.
+
+
 How sr works
 ===========
 You might be interested to know how we implement the sr tool. So here is the algorithm: 
