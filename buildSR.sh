@@ -25,4 +25,6 @@ sudo chmod 644 /etc/pam.d/sr || exit
 sudo cp capabilityRole.conf /etc/security || exit
 sudo chmod 644 /etc/security/capabilityRole.conf || exit
 
+sudo chmod 705 $PWD
+
 echo "Please restart your computer to make changes effective"
