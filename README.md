@@ -100,6 +100,7 @@ PAM repository : https://github.com/linux-pam/linux-pam
 
 libcap repository : https://github.com/mhiramat/libcap
 
+Where I have found the simple Python code for HTTP server : https://docs.python.org/2/library/simplehttpserver.html
 
 
 Very helpfull site, where you can find some informations about PAM, libcap and the capabilities:
