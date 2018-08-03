@@ -74,7 +74,7 @@ the second solution is to use pam_cap.so module. In this case all scripts run by
 Our solution provides a better alternative. Suppose that the capabilityRole.conf contains the follwing configuratiion:
 
                                   role1 cap_net_bind_service guillaume none 
-Then the user needs only to assume role1 using our sr tool and then run its script. (S)he can use other shell to run the other non-privileged scripts.
+Then the user needs only to assume role1 using our sr tool and then run his (her) script. (S)he can use other shell to run the other non-privileged scripts.
 
 
 ![Screenshot](scenarioPython/connectionWithRole.png)
