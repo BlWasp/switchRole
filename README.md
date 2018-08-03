@@ -79,7 +79,7 @@ As you see, the inheriable set of the shell has now the new capability.
 
 ![Screenshot](scenarioPython/bashPamCap.png)
 
-The administraor has to use setcap command to inject cap_net_bind_service in the Effective and Inheritable set of the interpreter. After that the user can run the script.
+The administrator has to use setcap command to inject cap_net_bind_service in the Effective and Inheritable set of the interpreter. After that the user can run the script.
 
 ![Screenshot](scenarioPython/connectionWithPamCap.png)
 
