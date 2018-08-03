@@ -99,7 +99,27 @@ And as we can see here, python binary doesn't have any capabilities.
 
 Scenario 2 
 -----
-Suppose a developer wants to test a program that (s)he has developed in order to reduce the downloading rate on his server. The developer should use the LD_PRELOAD environment variable to load his shared library that intercepts all network calls made by the servers’ processes. With the current capabilities tools, the administrator of the server can use setcap command or pam_cap.so to give the developer cap_net_raw. However, the developer cannot achieve his test because, for security reasons, Linux kernel doesn’t take into account the capabilities stored in the binaries when LD_PRELOAD is configured.
+Suppose a developer wants to test a program that (s)he has developed in order to reduce the downloading rate on his server. The developer should use the LD_PRELOAD environment variable to load his shared library that intercepts all network calls made by the servers’ processes. With the current capabilities tools, the administrator of the server can use setcap command or pam_cap.so to give the developer cap_net_raw. However, the developer cannot achieve his test because, for security reasons, LD_PRELOAD doesn't works when capabilities are set in the binarie file.
+
+![Screenshot](scenarPreload/codeSocket.png)
+
+This is a code wich try to open a raw socket (cap_net_raw needed).
+
+![Screenshot](scenarPreload/codeCapture.png)
+
+This is a code wich try to intercept the connection.
+
+![Screenshot](scenarPreload/socketWithoutWithSetcap.png)
+
+As we can see, we need cap_net_raw to open this socket.
+
+![Screenshot](scenarPreload/preloadWithoutWithSetcap.png)
+
+But, with LD_PRELOAD it's a problem : if we set the capability, we can open the socket but we can't intercept, and without the capability we can't open the socket...
+
+![Screenshot](scenarPreload/preloadWithRole.png)
+
+This is the solution : with our module, you can use the cap_net_raw capability without set her in the binary file : you can open the socket and intercept the connection.
 
 
 Scenario 3 
