@@ -69,17 +69,21 @@ If we try to execute the script without any privilege, we get the expected 'Perm
 The first solution consists in using the setcap command in order to attribute the cap_net_bind_service capability to the python interpreter. Doing this create a security problem; now users present in the same system have the same privilege. 
 ![Screenshot](scenarioPython/connectionWithSetcap.png)
 
-The second solution is to use pam_cap.so module. In this case all scripts run by the same user will have the same privilege.
+The second solution is to use pam_cap.so module, as follows:
+
+The administrator sets cap_net_bind_service in the /etc/security/capability.conf file (pam_cap's configuration file).
 
 ![Screenshot](scenarioPython/pam_capConf.png)
-I set cap_net_bind_service in the capability.conf file (pam_cap's configuration file).
+
+As you see, the inheriable set of the shell has now the new capability.
 
 ![Screenshot](scenarioPython/bashPamCap.png)
-The bash's Inheritable set has taken the new capability.
+
+The administraor has to use setcap command to inject cap_net_bind_service in the Effective and Inheritable set of the interpreter. After that the user can run the script.
 
 ![Screenshot](scenarioPython/connectionWithPamCap.png)
 
-And if I set cap_net_bind_service in the Effective and Inheritable set, we can use the script.
+However, in this case all scripts run by the same user will have the same privilege :(
 
 Our solution provides a better alternative. Suppose that the capabilityRole.conf contains the follwing configuration:
 
