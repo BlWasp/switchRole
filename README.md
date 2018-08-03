@@ -43,7 +43,7 @@ After that a new shell is oppend that contains the capabilities in the role that
 
 **No Root**
 
-You have the possibility to launch a full capabale shell that doesn't give any special treatment to uid 0. The root user is considered as any other normal user and you can in this case grant him in the capabilitirol.conf file few privileges:
+You have the possibility to launch a full capabale shell that doesn't give any special treatment to uid 0. The root user is considered as any other normal user and you can in this case grant him a few privileges in the capabilitirole.conf distributed by our module :
 
 `./sr -noroot role1`
 
