@@ -66,16 +66,19 @@ If we try to execute the script without any privilege, we get the expected 'Perm
 ![Screenshot](scenarioPython/connectionFailed.png)
 
 
-The first solution consists in using the setcap command in order to attribute the cap_net_bind_service capability to the python interpreter. Doing this create a security problem; now all the script launched by the interpreter will have this capability.
+The first solution consists in using the setcap command in order to attribute the cap_net_bind_service capability to the python interpreter. Doing this create a security problem; now users present in the same system have the same privlidge. 
 ![Screenshot](scenarioPython/connectionWithSetcap.png)
 
-Second solution is to use this module. First, you configure the capabilityRole.conf file : here I set cap_net_bind_service in the role1.
+the second solution is to use pam_cap.so module. In this case all scripts run by the same user will have the same privilege.
+
+Our solution provides a better alternative. Suppose that the capabilityRole.conf contains the follwing configuratiion:
+
+                                  role1 cap_net_bind_service guillaume none 
+Then the user needs only to assume role1 using our sr tool and then run its script. (S)he can use other shell to run the other non-privileged scripts.
 
 ![Screenshot](scenarioPython/capabilityConf.png)
 
 
-
-Then, we launch a new bash with sr and the role1, and we can launch our script without any problem !
 ![Screenshot](scenarioPython/connectionWithRole.png)
 
 
