@@ -47,7 +47,7 @@ You have the possibility to launch a full capabale shell that doesn't give any s
 
 `./sr -noroot role1`
 
-We use the securebits to provide this functionality. So It's  impossible to launch a command with sudo and the set-uid-root would not have any effect. So in thi shell, you can't for example use the ping command without a role that has cap_net_raw privilege.
+We use the securebits to provide this functionality. Any set-uid-root program will be run without having any special effect. So in the shell, you can't for example use the ping command without a role that has cap_net_raw privilege.
 
 Motivation scenarios
 ===========
