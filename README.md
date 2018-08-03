@@ -83,6 +83,9 @@ Then the user needs only to assume role1 using our sr tool and then run its scri
 
 And as we can see here, python binary doesn't have any capabilities.
 
+Scenario 2 
+-----
+an administrator wants to attribute a user the privilege to run an apache server. Without our module, the administrator can use either setcap command to inject the necessary privilege in the binary of apache server (option1) or use pam_cap.so module and setcap command (option2). Both options have problems: All systems' users will get this privilege in the case of option 1. The configuration of the binary apache will be lost after updating the apache package.  
 
 
 How sr works
