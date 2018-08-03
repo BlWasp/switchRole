@@ -85,7 +85,7 @@ And as we can see here, python binary doesn't have any capabilities.
 
 Scenario 2 
 -----
-Suppose a developer wants to test a program that (s)he is developed in order to reduce the downloading rate on his server. The developer should use the LD_PRELOAD environment variable to load his shared library that intercepts all network calls made by the servers’ processes. With the current capabilities tools, the administrator of the server can use setcap command or pam_cap.so to give the developer cap_net_raw. However, the developer cannot achieve his test because, for security reasons, Linux kernel doesn’t take into account the capabilities stored in the binaries when LD_PRELOAD is configured.
+Suppose a developer wants to test a program that (s)he has developed in order to reduce the downloading rate on his server. The developer should use the LD_PRELOAD environment variable to load his shared library that intercepts all network calls made by the servers’ processes. With the current capabilities tools, the administrator of the server can use setcap command or pam_cap.so to give the developer cap_net_raw. However, the developer cannot achieve his test because, for security reasons, Linux kernel doesn’t take into account the capabilities stored in the binaries when LD_PRELOAD is configured.
 
 
 Scenario 3 
