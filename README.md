@@ -150,7 +150,6 @@ PAM repository : https://github.com/linux-pam/linux-pam
 
 libcap repository : https://github.com/mhiramat/libcap
 
-Where I have found the simple Python code for HTTP server : https://docs.python.org/2/library/simplehttpserver.html
 
 
 Very helpfull site, where you can find some informations about PAM, libcap and the capabilities:
@@ -167,3 +166,11 @@ Simple article with test code for Ambient : https://s3hh.wordpress.com/2015/07/
 Article about how PAM is working : https://artisan.karma-lab.net/petite-introduction-a-pam
 
 A very helpfull code about how to create a PAM module : https://github.com/beatgammit/simple-pam
+
+
+
+Source of the scenarios code:
+
+Where I have found the simple Python code for HTTP server : https://docs.python.org/2/library/simplehttpserver.html
+
+Where I have found the simple PRELOAD code : https://fishi.devtail.io/weblog/2015/01/25/intercepting-hooking-function-calls-shared-c-libraries/
