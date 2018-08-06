@@ -79,6 +79,8 @@ int main (int argc, char *argv[])
 	/* Here we launch the bash with the capabilities in P, E, I and A. */
 	char *newargv[] = { NULL };
 	char *newenviron[] = { NULL };
+	
+	printf("Capabilities selected : %s\n",argv[2]);
 		
 	newargv[0] = "/bin/bash";
 	newargv[1] = NULL;
