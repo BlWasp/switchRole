@@ -417,18 +417,31 @@ void fork_setcap(char* user, char* role, int noroot)
 	/* sr_aux will be used to fill the ambient set of the process and launch the bash.
 	But, if more than 1 user want to use Switch Role at the same time, it's a problem.
 	For this reason, the program make a copy of sr_aux and it will work on it.
-	The copy has an unique name (sr_aux_userName_role) */
+	The copy has an unique name (sr_aux_userName_role). If user is root, the new file will go to /home/
+	else, it will go to /home/username/ */
 	
-	char *srAux = "sr_aux_";
-	char *home = "/home/";
-	char *srAuxUnique = malloc(strlen(home) + strlen("/") + strlen(srAux) + strlen(user) + strlen(role) + strlen("_") + 1);
-	strcpy(srAuxUnique,home);
-	strcat(srAuxUnique,user);
-	strcat(srAuxUnique,"/");
-	strcat(srAuxUnique,srAux);
-	strcat(srAuxUnique,user);
-	strcat(srAuxUnique,"_");
-	strcat(srAuxUnique,role);
+	char *srAuxUnique;
+	if (!strcmp(user,"root")) {
+		char *srAux = "sr_aux_";
+		char *home = "/home/";
+		srAuxUnique = malloc(strlen(home) + strlen(srAux) + strlen(user) + strlen(role) + strlen("_") + 1);
+		strcpy(srAuxUnique,home);
+		strcat(srAuxUnique,srAux);
+		strcat(srAuxUnique,user);
+		strcat(srAuxUnique,"_");
+		strcat(srAuxUnique,role);
+	} else{
+		char *srAux = "sr_aux_";
+		char *home = "/home/";
+		srAuxUnique = malloc(strlen(home) + strlen("/") + strlen(srAux) + strlen(user) + strlen(role) + strlen("_") + 1);
+		strcpy(srAuxUnique,home);
+		strcat(srAuxUnique,user);
+		strcat(srAuxUnique,"/");
+		strcat(srAuxUnique,srAux);
+		strcat(srAuxUnique,user);
+		strcat(srAuxUnique,"_");
+		strcat(srAuxUnique,role);
+	}
 	
 	if (fork()) {
 		/* wait as long as any child is there */
@@ -460,11 +473,6 @@ void fork_setcap(char* user, char* role, int noroot)
 		It will add the Ambient capabilities and launch the bash */
 		char *newargv[] = { NULL };
 		char *newenviron[] = { NULL };
-		
-		char *path = "./";
-		char *pathSr = malloc(strlen(path) + strlen(srAuxUnique) + 1);
-		strcpy(pathSr,path);
-		strcat(pathSr,srAuxUnique);
 		
 		newargv[0] = srAuxUnique;
 		char* rootArg;
