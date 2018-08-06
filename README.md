@@ -57,7 +57,7 @@ Scenario 1
 A user contacts his administrator to give him a privilege that allows him running an HTTP server that is developed using Python. His script needs the privilege CAP_NET_BIND_SERVICE to bind the server socket to 80 port.  Without our module, the administrator has two options: (1)  Use setcap command to inject the privilege into Python interpreter or (2) use pam_cap.so to attribute the CAP_NET_BIND_SERVICE to the user and then inject this privilege in the inheritable and effective sets of the interpreter. Both solutions have security problems because in the case of option (1), the Python interpreter can be used by any another user with this privilege. In the case of option (2) other python scripts run by the legitimate user will have the same privilege.
 
 
-Here a simple python script that needs to bind a server on the port 80 [10] (the user running the script needs CAP_NET_BIND_SERVICE to do that).
+Here a simple python script that needs to bind a server on the port 80 [9] (the user running the script needs CAP_NET_BIND_SERVICE to do that).
 
 ![Screenshot](scenarioPython/codeServer.png)
 
@@ -101,11 +101,11 @@ Scenario 2
 -----
 Suppose a developer wants to test a program that (s)he has developed in order to reduce the downloading rate on his server. The developer should use the LD_PRELOAD environment variable to load his shared library that intercepts all network calls made by the servers’ processes. With the current capabilities tools, the administrator of the server can use setcap command or pam_cap.so to give the developer cap_net_raw. However, the developer cannot achieve his test because, for security reasons, LD_PRELOAD doesn't work when capabilities are set in the binary file.
 
-This is an example program which tries to open a raw socket (cap_net_raw needed) [11]:
+This is an example program which tries to open a raw socket (cap_net_raw needed) [10]:
 
 ![Screenshot](scenarPreload/codeSocket.png)
 
-This is a code which tries to intercept the socket() call [11].
+This is a code which tries to intercept the socket() call [10].
 
 ![Screenshot](scenarPreload/codeCapture.png)
 
