@@ -113,7 +113,7 @@ As we can see, we need cap_net_raw to open this socket.
 
 ![Screenshot](scenarPreload/socketWithoutWithSetcap.png)
 
-But, with LD_PRELOAD it's a problem : if we set the capability, we can open the socket but we can't intercept, and without the capability we can't open the socket...
+But, when the LD_PRELOAD is configured, Linux kernel disable the interception of socket() call. The following figure shows how the interception works correctly after having removed the capability from the binary file (setcap -r), and not correctly when the capacity is re-added to the binary file.
 
 ![Screenshot](scenarPreload/preloadWithoutWithSetcap.png)
 
