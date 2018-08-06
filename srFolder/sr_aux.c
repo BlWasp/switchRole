@@ -75,7 +75,7 @@ int main (int argc, char *argv[])
 		prctl(PR_SET_SECUREBITS, 0xf); //Set the noroot and nosuid bits (see man mount and man capabilities for explanation)
 	}
 	
-	printf("bash launch\n");
+	//printf("bash launch\n");
 	/* Here we launch the bash with the capabilities in P, E, I and A. */
 	char *newargv[] = { NULL };
 	char *newenviron[] = { NULL };
