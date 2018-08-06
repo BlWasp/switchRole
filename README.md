@@ -135,30 +135,32 @@ NoRoot Scenario
 -----
 With -noroot option the kernel considers the root user as any normal user. 
 
-Here sr tool is launched with the root user but without -noroot : 
+Here, the sr tool is launched with the root user but without -noroot : 
 
 ![Screenshot](scenarioNoRoot/rootWithoutNoroot.png)
 
-here is the result When we add the -noroot option : 
+as you see, the root user obtains the full list of privileges.
+
+Here is the result when we add the -noroot option : 
 
 ![Screenshot](scenarioNoRoot/rootNorootRole1.png)
 
-Under this mode, set-uid-root programs will not have the full list of privileges and they can not be launched:
-For example, lets check result of the ping program: 
+As you see now, the root user didn't obtain the full list of privileges.
 
-It works when root user assume the role2.
+Under this mode, set-uid-root programs will not have the full list of privileges and they can not be launched.
+
+For example, lets check result of the ping program. Suppose that we assign the role2 to root user as follows:
 
 ![Screenshot](scenarioNoRoot/rootConfRole2.png)
 
-If I launch the role2 as root with the -noroot option I can't use `ping 0` because cap_net_raw is not set.
+When the root user assume the role2 with -noroot option, he can't use `ping 0` because cap_net_raw is not present its role.
 
 ![Screenshot](scenarioNoRoot/rootRole2NoRootCantPing.png)
 
-Now I allow root to use role1.
+If we modify the configuration to assign role1 that conains cap_net_raw privilege to root user, we see that he can now use ping:
 
 ![Screenshot](scenarioNoRoot/rootConfRole1.png)
 
-And root can ping.
 
 ![Screenshot](scenarioNoRoot/rootRole1NoRootPing.png).
 
