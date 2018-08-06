@@ -101,25 +101,26 @@ Scenario 2
 -----
 Suppose a developer wants to test a program that (s)he has developed in order to reduce the downloading rate on his server. The developer should use the LD_PRELOAD environment variable to load his shared library that intercepts all network calls made by the servers’ processes. With the current capabilities tools, the administrator of the server can use setcap command or pam_cap.so to give the developer cap_net_raw. However, the developer cannot achieve his test because, for security reasons, LD_PRELOAD doesn't works when capabilities are set in the binarie file.
 
+This is an example program which tries to open a raw socket (cap_net_raw needed) [10]:
+
 ![Screenshot](scenarPreload/codeSocket.png)
 
-This is a code wich try to open a raw socket (cap_net_raw needed).
+This is a code which tries to intercept the socket() call [10].
 
 ![Screenshot](scenarPreload/codeCapture.png)
 
-This is a code wich try to intercept the connection.
+As we can see, we need cap_net_raw to open this socket.
 
 ![Screenshot](scenarPreload/socketWithoutWithSetcap.png)
 
-As we can see, we need cap_net_raw to open this socket.
+But, with LD_PRELOAD it's a problem : if we set the capability, we can open the socket but we can't intercept, and without the capability we can't open the socket...
 
 ![Screenshot](scenarPreload/preloadWithoutWithSetcap.png)
 
-But, with LD_PRELOAD it's a problem : if we set the capability, we can open the socket but we can't intercept, and without the capability we can't open the socket...
+With our module, no need set the capability in the binary file: you can open the socket and intercept the connection.
 
 ![Screenshot](scenarPreload/preloadWithRole.png)
 
-This is the solution : with our module, you can use the cap_net_raw capability without set her in the binary file : you can open the socket and intercept the connection.
 
 
 Scenario 3 
@@ -146,31 +147,31 @@ In terms of capabilities calucations by Linux Kernel, here is what happens:
 References
 ==========
 
-PAM repository : https://github.com/linux-pam/linux-pam
+[1] PAM repository : https://github.com/linux-pam/linux-pam
 
-libcap repository : https://github.com/mhiramat/libcap
+[2] libcap repository : https://github.com/mhiramat/libcap
 
 
 
 Very helpfull site, where you can find some informations about PAM, libcap and the capabilities:
 
 
-Original paper about capabilities : https://pdfs.semanticscholar.org/6b63/134abca10b49661fe6a9a590a894f7c5ee7b.pdf
+[3] Original paper about capabilities : https://pdfs.semanticscholar.org/6b63/134abca10b49661fe6a9a590a894f7c5ee7b.pdf
 
-Article about the capabilities : https://lwn.net/Articles/632520/
+[4] Article about the capabilities : https://lwn.net/Articles/632520/
 
-Article about Ambient : https://lwn.net/Articles/636533/
+[5] Article about Ambient : https://lwn.net/Articles/636533/
 
-Simple article with test code for Ambient : https://s3hh.wordpress.com/2015/07/25/ambient-capabilities/
+[6] Simple article with test code for Ambient : https://s3hh.wordpress.com/2015/07/25/ambient-capabilities/
 
-Article about how PAM is working : https://artisan.karma-lab.net/petite-introduction-a-pam
+[7] Article about how PAM is working : https://artisan.karma-lab.net/petite-introduction-a-pam
 
-A very helpfull code about how to create a PAM module : https://github.com/beatgammit/simple-pam
+[8] A very helpfull code about how to create a PAM module : https://github.com/beatgammit/simple-pam
 
 
 
 Source of the scenarios code:
 
-Where I have found the simple Python code for HTTP server : https://docs.python.org/2/library/simplehttpserver.html
+[9] Where I have found the simple Python code for HTTP server : https://docs.python.org/2/library/simplehttpserver.html
 
-Where I have found the simple PRELOAD code : https://fishi.devtail.io/weblog/2015/01/25/intercepting-hooking-function-calls-shared-c-libraries/
+[10] Where I have found the simple PRELOAD code : https://fishi.devtail.io/weblog/2015/01/25/intercepting-hooking-function-calls-shared-c-libraries/
