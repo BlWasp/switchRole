@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
 	char *newargv[] = { NULL };
 	char *newenviron[] = { NULL };
 	
-	printf("Capabilities selected : %s\n",argv[2]);
+	printf("Privileged bash launch with the following capabilities : %s\n",argv[2]);
 		
 	newargv[0] = "/bin/bash";
 	newargv[1] = NULL;
