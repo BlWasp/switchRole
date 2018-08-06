@@ -131,6 +131,32 @@ Scenario 4
 -----
 Two developers create a shared folder in which they stored a common program that they develop together. This program requires cap_net_raw privilege. The developers have to mount their shared folder using NFS v3.  This scenario is not feasible with the current tools because NFS v3 doesn’t support extended attributes. 
 
+Scenario NoRoot
+-----
+The option -noroot allow you to limit the root capabilities to the role wanted. The difference between with -noroot and without -noroot.
+
+Here, a role launch with the root user without -noroot : ![Screenshot](scenarioNoRoot/rootWithoutNoroot.png)
+
+And with -noroot : ![Screenshot](scenarioNoRoot/rootNorootRole1.png)
+
+
+We will try to use the `ping 0` command with -noroot.
+
+I allow root to use role2.
+
+![Screenshot](scenarioNoRoot/rootConfRole2.png)
+
+If I launch the role2 as root with the -noroot option I can't use `ping 0` because cap_net_raw is not set.
+
+![Screenshot](scenarioNoRoot/rootRole2NoRootCantPing.png)
+
+Now I allow root to use role1.
+
+![Screenshot](scenarioNoRoot/rootConfRole1.png)
+
+And root can ping.
+
+![Screenshot](scenarioNoRoot/rootRole1NoRootPing.png).
 
 
 How sr works
