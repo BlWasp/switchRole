@@ -1,10 +1,5 @@
 # PAM configuration for the the Switch Role system
 
-auth	optional pam_moduleSR.so
-
-# root can use without passwd
-auth	sufficient pam_rootok.so
-
 @include common-auth
 @include common-account
 @include common-session
