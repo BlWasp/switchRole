@@ -449,7 +449,7 @@ void fork_setcap(char* user, char* role, int noroot)
 		pcs.role = role;
 		set_capabilities(&pcs);
 		
-		printf("sr_aux_bis launch\n");
+		//printf("sr_aux_bis launch\n");
 		/* Here we launch the aux process with the capabilities in P, E and I.
 		It will add the Ambient capabilities and launch the bash */
 		char *newargv[] = { NULL };
@@ -524,7 +524,7 @@ int main(int argc, char *argv[])
 	/* username is used for authentification and role access control */
 	user = getenv("USER");
 
-	printf("User : %s\n",user);
+	//printf("User : %s\n",user);
 	
 	retval = pam_start("check_user", user, &conv, &pamh);
 
@@ -537,7 +537,7 @@ int main(int argc, char *argv[])
 
 	// Can the account be used at this time?
 	if (retval == PAM_SUCCESS) {
-		printf("Account is valid.\n");
+		//printf("Account is valid.\n");
 		retval = pam_acct_mgmt(pamh, 0);
 	} else{
 		printf("Authentification failed.\n");
@@ -546,7 +546,7 @@ int main(int argc, char *argv[])
 	
 	// Did everything work?
 	if (retval == PAM_SUCCESS) {
-		printf("Authenticated\n");
+		//printf("Authenticated\n");
 	} else {
 		printf("Not Authenticated\n");
 	}
