@@ -137,7 +137,7 @@ How sr works
 ===========
 You might be interested to know how we implement the sr tool. So here is the algorithm: 
 
-![Screenshot](algorithm1.jpg)
+![Screenshot](algorithm2.jpg)
 
 In terms of capabilities calucations by Linux Kernel, here is what happens:
 
