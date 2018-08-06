@@ -101,11 +101,11 @@ Scenario 2
 -----
 Suppose a developer wants to test a program that (s)he has developed in order to reduce the downloading rate on his server. The developer should use the LD_PRELOAD environment variable to load his shared library that intercepts all network calls made by the servers’ processes. With the current capabilities tools, the administrator of the server can use setcap command or pam_cap.so to give the developer cap_net_raw. However, the developer cannot achieve his test because, for security reasons, LD_PRELOAD doesn't works when capabilities are set in the binarie file.
 
-This is an example program which tries to open a raw socket (cap_net_raw needed) [10]:
+This is an example program which tries to open a raw socket (cap_net_raw needed) [11]:
 
 ![Screenshot](scenarPreload/codeSocket.png)
 
-This is a code which tries to intercept the socket() call [10].
+This is a code which tries to intercept the socket() call [11].
 
 ![Screenshot](scenarPreload/codeCapture.png)
 
