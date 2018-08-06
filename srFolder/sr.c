@@ -420,8 +420,12 @@ void fork_setcap(char* user, char* role, int noroot)
 	The copy has an unique name (sr_aux_userName_role) */
 	
 	char *srAux = "sr_aux_";
-	char *srAuxUnique = malloc(strlen(srAux) + strlen(user) + strlen(role) +  strlen("_") + 1);
-	strcpy(srAuxUnique,srAux);
+	char *home = "/home/";
+	char *srAuxUnique = malloc(strlen(home) + strlen("/") + strlen(srAux) + strlen(user) + strlen(role) + strlen("_") + 1);
+	strcpy(srAuxUnique,home);
+	strcat(srAuxUnique,user);
+	strcat(srAuxUnique,"/");
+	strcat(srAuxUnique,srAux);
 	strcat(srAuxUnique,user);
 	strcat(srAuxUnique,"_");
 	strcat(srAuxUnique,role);
@@ -434,9 +438,11 @@ void fork_setcap(char* user, char* role, int noroot)
 			while(wait(NULL) == -1 && errno == EINTR);
 			
 			char *rm = "rm ";
-			char *rmSr = malloc(strlen(rm) + strlen(srAuxUnique) + 1);
+			char *silent = " 2> /dev/null";
+			char *rmSr = malloc(strlen(rm) + strlen(srAuxUnique) + strlen(silent) + 1);
 			strcpy(rmSr,rm);
 			strcat(rmSr,srAuxUnique);
+			strcat(rmSr,silent);
 			
 			//printf("Remove sr_aux_bis\n");
 			system(rmSr);
@@ -460,14 +466,15 @@ void fork_setcap(char* user, char* role, int noroot)
 		strcpy(pathSr,path);
 		strcat(pathSr,srAuxUnique);
 		
-		newargv[0] = pathSr;
+		newargv[0] = srAuxUnique;
 		char* rootArg;
 		if (noroot)
 			rootArg = "noroot";
 		else
 			rootArg = "root";
 		newargv[1] = rootArg;;
-		newargv[2] = NULL;
+		newargv[2] = read_capabilities_for_role(user,role);
+		newargv[3] = NULL;
 		execve(newargv[0],newargv,newenviron);
 		perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
 		exit(EXIT_FAILURE);	
@@ -490,7 +497,7 @@ void fork_setcap(char* user, char* role, int noroot)
 	strcpy(result, s1);
 	strcat(result, s2);
 	
-	char *cp = "cp sr_aux ";
+	char *cp = "cp /usr/bin/sr_aux ";
 	char *cpSr = malloc(strlen(cp) + strlen(srAuxUnique) + 1);
 	strcpy(cpSr,cp);
 	strcat(cpSr,srAuxUnique);
