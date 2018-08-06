@@ -131,18 +131,22 @@ Scenario 4
 -----
 Two developers create a shared folder in which they stored a common program that they develop together. This program requires cap_net_raw privilege. The developers have to mount their shared folder using NFS v3.  This scenario is not feasible with the current tools because NFS v3 doesn’t support extended attributes. 
 
-Scenario NoRoot
+NoRoot Scenario 
 -----
-The option -noroot allow you to limit the root capabilities to the role wanted. The difference between with -noroot and without -noroot.
+With -noroot option the kernel considers the root user as any normal user. 
 
-Here, a role launch with the root user without -noroot : ![Screenshot](scenarioNoRoot/rootWithoutNoroot.png)
+Here sr tool is launched with the root user but without -noroot : 
 
-And with -noroot : ![Screenshot](scenarioNoRoot/rootNorootRole1.png)
+![Screenshot](scenarioNoRoot/rootWithoutNoroot.png)
 
+here is the result When we add the -noroot option : 
 
-We will try to use the `ping 0` command with -noroot.
+![Screenshot](scenarioNoRoot/rootNorootRole1.png)
 
-I allow root to use role2.
+Under this mode, set-uid-root programs will not have the full list of privileges and they can not be launched:
+For example, lets check result of the ping program: 
+
+It works when root user assume the role2.
 
 ![Screenshot](scenarioNoRoot/rootConfRole2.png)
 
