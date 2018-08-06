@@ -57,7 +57,7 @@ Scenario 1
 A user contacts his administrator to give him a privilege that allows him running an HTTP server that is developed using Python. His script needs the privilege CAP_NET_BIND_SERVICE to bind the server socket to 80 port.  Without our module, the administrator has two options: (1)  Use setcap command to inject the privilege into Python interpreter or (2) use pam_cap.so to attribute the CAP_NET_BIND_SERVICE to the user and then inject this privilege in the inheritable and effective sets of the interpreter. Both solutions have security problems because in the case of option (1), the Python interpreter can be used by any another user with this privilege. In the case of option (2) other python scripts run by the legitimate user will have the same privilege.
 
 
-Here a simple python script that needs to bind a server on the port 80 (the user running the script needs CAP_NET_BIND_SERVICE to do that).
+Here a simple python script that needs to bind a server on the port 80 [10] (the user running the script needs CAP_NET_BIND_SERVICE to do that).
 
 ![Screenshot](scenarioPython/codeServer.png)
 
@@ -85,7 +85,7 @@ The administrator has to use setcap command to inject cap_net_bind_service in th
 
 However, in this case all scripts run by the same user will have the same privilege :(
 
-Our solution provides a better alternative. Suppose that the capabilityRole.conf contains the follwing configuration:
+Our solution provides a better alternative. Suppose that the capabilityRole.conf contains the following configuration:
 
                                   role1 cap_net_bind_service guillaume none 
 Then the user needs only to assume role1 using our sr tool and then run his (her) script. (S)he can use other shell to run the other non-privileged scripts.
