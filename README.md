@@ -23,7 +23,7 @@ How to Build
 
 	1. git clone https://github.com/guillaumeDaumas/switchRole
     
-    2. cd swithRole
+    2. cd switchRole
     
     3. execute the following installation script as root :
 		`sh ./buildSR.sh`
