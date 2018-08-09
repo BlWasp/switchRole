@@ -150,9 +150,18 @@ static char* read_capabilities_for_role(char *user, char *role)
 				if (cpt == 2) {
 					lineBis = line;
 					lineTer = strtok_r(lineBis,TOK_FLOAT,&saveptr2);
-					FILE *fGroup = popen("groups $USER","r");
+					
+					char *gr = "groups ";
+					char *grU = malloc(strlen(gr) + strlen(user) + 1);
+					strcpy(grU,gr);
+					strcat(grU,user);
+					FILE *fGroup = popen(grU,"r");
+					free(grU);
+					//FILE *fGroup = popen("groups $USER","r");
+					
 					char *listString = malloc(sizeof(fGroup));
 					fgets(listString,MAX_LEN,fGroup);
+					pclose(fGroup);
 
 					char *str, *token;
 					int i = 0;
@@ -224,7 +233,7 @@ static char* read_capabilities_for_role(char *user, char *role)
 					}
 					free(listString);
 					free(list);
-					pclose(fGroup);
+					//pclose(fGroup);
 				}
 				
 				cpt++;
@@ -292,8 +301,10 @@ int set_capabilities(struct pam_cap_s *cs)
 		cpt++;
 	}
 	
-	if (cap_set_flag(caps, CAP_INHERITABLE, cpt, cap_list, CAP_SET) == -1)
-		perror("Problem with Inheritable\n");
+	if (cap_set_flag(caps, CAP_INHERITABLE, cpt, cap_list, CAP_SET) == -1) {
+		perror("Problem with Inheritable set_capabilities\n");
+		exit(EXIT_FAILURE);
+	}
 
 	if (cap_set_proc(caps) == -1) {
 		perror("Capabilities were not set\n");
@@ -324,8 +335,10 @@ int set_setfcap(void)
 	/* Extract caps in string format from conf_icaps to cap_value_t format */
 	cap_from_name("cap_setfcap", &cap_list[0]);
 	
-	if (cap_set_flag(caps, CAP_INHERITABLE, 1, cap_list, CAP_SET) == -1)
-		perror("Problem with Inheritable\n");
+	if (cap_set_flag(caps, CAP_INHERITABLE, 1, cap_list, CAP_SET) == -1) {
+		perror("Problem with Inheritable set_setfcap\n");
+		exit(EXIT_FAILURE);
+	}
 
 	if (cap_set_proc(caps) == -1) {
 		perror("Capabilities were not set\n");
@@ -360,8 +373,10 @@ int set_setpcap(void)
 	/* Extract caps in string format from conf_icaps to cap_value_t format */
 	cap_from_name("cap_setpcap", &cap_list[0]);
 	
-	if (cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_SET) == -1)
-		perror("Problem with Inheritable\n");
+	if (cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_SET) == -1) {
+		perror("Problem with Effective set_setpcap\n");
+		exit(EXIT_FAILURE);
+	}
 
 	if (cap_set_proc(caps) == -1) {
 		perror("Capabilities were not set\n");
@@ -391,8 +406,10 @@ int set_dac_override(void)
 	/* Extract caps in string format from conf_icaps to cap_value_t format */
 	cap_from_name("cap_dac_override", &cap_list[0]);
 	
-	if (cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_SET) == -1)
-		perror("Problem with Inheritable\n");
+	if (cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_SET) == -1) {
+		perror("Problem with Effective set_dac_override\n");
+		exit(EXIT_FAILURE);
+	}
 
 	if (cap_set_proc(caps) == -1) {
 		perror("Capabilities were not set\n");
@@ -556,7 +573,7 @@ int main(int argc, char *argv[])
 	char *command = NULL;
 	char *role = NULL;
 	
-	static const struct option longopts[] = {
+	/*static const struct option longopts[] = {
 		{"command", required_argument, NULL, 'c'},
 		{"user", required_argument, NULL, 'u'},
 		{"role", required_argument, NULL, 'r'},
@@ -592,6 +609,21 @@ int main(int argc, char *argv[])
 		default:
 			exit(EXIT_FAILURE);
 		}
+	}*/
+	
+	for (int i=1; i<argc; i++) {
+		if (!strcmp(argv[i],"-c"))
+			command = argv[i+1];
+		if (!strcmp(argv[i],"-u"))
+			user = argv[i+1];
+		if (!strcmp(argv[i],"-r"))
+			role = argv[i+1];
+		if (!strcmp(argv[i],"-n"))
+			noroot = 1;
+		if (!strcmp(argv[i],"-h")) {
+			printf("Usage : sr -r role [-u user] [-c commande] [-n]\n");
+			exit(EXIT_SUCCESS);
+		}
 	}
 	
 	if (role == NULL) {
@@ -611,7 +643,7 @@ int main(int argc, char *argv[])
 			
 			FILE *fId = popen(takeId, "r"); //Take only the uid of the specified user
 			char *id = malloc(sizeof(fId));
-			fgets(id,MAX_LEN,fId);
+			fgets(id,sizeof(id),fId);
 			
 			free(takeId);
 			pclose(fId);
