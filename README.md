@@ -53,7 +53,7 @@ We use the securebits to provide this functionality. Any set-uid-root program wi
 
 **Service managment**
 
-Any user who has cap_setuid or cap_setgid (typically this is the root) can assume the roles of other users without passing the authentication phase. This option is more for the services. In this mode, You can should determine the username, role name and the command (you can, also, add the noroot option) :
+Any user who has cap_setuid or cap_setgid (typically this is the root) can assume the roles of other users without passing the authentication phase. This option is more for the services. In this mode, You should determine the username, role name and the command (you can, also, add the noroot option) :
 
 `sr -r role1 -u username -c command`
 
