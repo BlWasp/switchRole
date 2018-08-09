@@ -35,13 +35,15 @@ Usage
 
 After the installation you will find a file called capabilityRole.conf in the /etc/security directory. You should configure this file in order to define the set of roles and assign them to users or group of users on your system.
 
-Once configuration is done, a user can assume a role using the tool ‘sr’ that is installed with our package. In your shell type for example :
+**assume Roles**
+
+Once configuration is done, a user can assume a role using the ‘sr’ tool  that is installed with our package. In your shell type for example :
 
 `sr -r role1` 
 
-After that a new shell is oppend that contains the capabilities in the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you exit you can retrun to your initial shell. 
+After that a new shell is openned. This shell contains the capabilities of the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you make an exit() you retrun to your initial shell without any privilege. 
 
-**No Root**
+**No Root mode**
 
 You have the possibility to launch a full capabale shell that doesn't give any special treatment to uid 0. The root user is considered as any other normal user and you can in this case grant him a few privileges in the capabilityRole.conf distributed by our module :
 
@@ -49,13 +51,12 @@ You have the possibility to launch a full capabale shell that doesn't give any s
 
 We use the securebits to provide this functionality. Any set-uid-root program will be run without having any special effect. So in the shell, you can't for example use the ping command without a role that has cap_net_raw privilege.
 
-**Setuid With Command**
+**Service managment**
 
-This option is more for the services. When a service is launch as root, it could be interesting to limit privileges for some actions. You can call sr with a role, the user you want to switch to, and the command you want to run (you can, also, add the noroot option) :
+Any user who has cap_setuid or cap_setgid (typically this is the root) can assume the roles of other users without passing the authentication phase. This option is more for the services. In this mode, You can should determine the username, role name and the command (you can, also, add the noroot option) :
 
 `sr -r role1 -u username -c command`
 
-The module will check if your service has CAP_SETUID and/or CAP_SETGID, switch user, launch a bash with the role (if the user can assume it) and run the command in the new bash.
 
 Motivation scenarios
 ===========
@@ -141,9 +142,9 @@ Two developers create a shared folder in which they stored a common program that
 
 NoRoot Scenario 
 -----
-With -noroot option the kernel considers the root user as any normal user. 
+With -n option the kernel considers the root user as any normal user. 
 
-Here, the sr tool is launched with the root user but without -noroot : 
+Here, the sr tool is launched with the root user but without -n : 
 
 ![Screenshot](scenarioNoRoot/rootWithoutNoroot.png)
 
