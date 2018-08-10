@@ -84,7 +84,7 @@ static void add_ambient(void)
 			stringToCap = capng_name_to_capability(capToCap_ng);
 
 			if (prctl(PR_CAP_AMBIENT,PR_CAP_AMBIENT_RAISE,stringToCap,0,0))
-				perror("Ambient not set);
+				perror("Ambient not set");
 		}
 	}
 
