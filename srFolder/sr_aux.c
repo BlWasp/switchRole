@@ -84,10 +84,19 @@ int main (int argc, char *argv[])
 	printf("Privileged bash launch with the following capabilities : %s\n",argv[2]);
 		
 	newargv[0] = "/bin/bash";
-	newargv[1] = NULL;
-	execve(newargv[0],newargv,newenviron);
-	perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
-	exit(EXIT_FAILURE);
+	if (!strcmp(argv[3],"yes")) {
+		newargv[1] = "-c";
+		newargv[2] = argv[4];
+		newargv[3] = NULL;
+		execve(newargv[0],newargv,newenviron);
+		perror("execve");
+		exit(EXIT_FAILURE);
+	} else{
+		newargv[1] = NULL;
+		execve(newargv[0],newargv,newenviron);
+		perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
+		exit(EXIT_FAILURE);
+	}
 
 	exit(EXIT_SUCCESS);
 }
