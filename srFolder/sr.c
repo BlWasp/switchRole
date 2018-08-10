@@ -83,8 +83,7 @@ static void add_ambient(void)
 
 			stringToCap = capng_name_to_capability(capToCap_ng);
 
-			if (prctl(PR_CAP_AMBIENT,PR_CAP_AMBIENT_RAISE,stringToCap,0,0))
-				perror("Ambient not set");
+			prctl(PR_CAP_AMBIENT,PR_CAP_AMBIENT_RAISE,stringToCap,0,0);
 		}
 	}
 
@@ -150,7 +149,14 @@ static char* read_capabilities_for_role(char *user, char *role)
 				if (cpt == 2) {
 					lineBis = line;
 					lineTer = strtok_r(lineBis,TOK_FLOAT,&saveptr2);
-					FILE *fGroup = popen("groups $USER","r");
+					
+					char *gr = "groups ";
+					char *grU = malloc(strlen(gr) + strlen(user) + 1);
+					strcpy(grU,gr);
+					strcat(grU,user);
+					FILE *fGroup = popen(grU,"r");
+					free(grU);
+					//FILE *fGroup = popen("groups $USER","r");
 					char *listString = malloc(sizeof(fGroup));
 					fgets(listString,MAX_LEN,fGroup);
 					pclose(fGroup);
@@ -191,7 +197,12 @@ static char* read_capabilities_for_role(char *user, char *role)
 						break;
 							
 					free(listString);
-					fGroup = popen("groups $USER","r");
+					grU = malloc(strlen(gr) + strlen(user) + 1);
+					strcpy(grU,gr);
+					strcat(grU,user);
+					fGroup = popen(grU,"r");
+					free(grU);
+					//fGroup = popen("groups $USER","r");
 					listString = malloc(sizeof(fGroup));
 					fgets(listString,MAX_LEN,fGroup);
 					pclose(fGroup);
@@ -296,8 +307,10 @@ int set_capabilities(struct pam_cap_s *cs)
 		cpt++;
 	}
 	
-	if (cap_set_flag(caps, CAP_INHERITABLE, cpt, cap_list, CAP_SET) == -1)
-		perror("Problem with Inheritable\n");
+	if (cap_set_flag(caps, CAP_INHERITABLE, cpt, cap_list, CAP_SET) == -1) {
+		perror("Problem with INHERITABLE set_capabilities\n");
+		exit(EXIT_FAILURE);
+	}
 
 	if (cap_set_proc(caps) == -1) {
 		perror("Capabilities were not set\n");
@@ -330,7 +343,7 @@ int set_setfcap(void)
 	cap_from_name("cap_setfcap", &cap_list[0]);
 	
 	if (cap_set_flag(caps, CAP_INHERITABLE, 1, cap_list, CAP_SET) == -1)
-		perror("Problem with Inheritable\n");
+		perror("Problem with INHERITABLE set_setfcap\n");
 
 	if (cap_set_proc(caps) == -1) {
 		perror("Capabilities were not set\n");
@@ -367,7 +380,7 @@ int set_setpcap(void)
 	cap_from_name("cap_setpcap", &cap_list[0]);
 	
 	if (cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_SET) == -1)
-		perror("Problem with Inheritable\n");
+		perror("Problem with EFFECTIVE set_setpcap\n");
 
 	if (cap_set_proc(caps) == -1) {
 		perror("Capabilities were not set\n");
@@ -399,7 +412,7 @@ int set_dac_override(void)
 	cap_from_name("cap_dac_override", &cap_list[0]);
 	
 	if (cap_set_flag(caps, CAP_EFFECTIVE, 1, cap_list, CAP_SET) == -1)
-		perror("Problem with Inheritable\n");
+		perror("Problem with EFFECTIVE set_dac_override\n");
 
 	if (cap_set_proc(caps) == -1) {
 		perror("Capabilities were not set\n");
@@ -415,21 +428,19 @@ int set_dac_override(void)
 
 
 /* We need a fork for the execve setcap. Without fork, we will lose controle on this processus after the execve */
-void fork_setcap(char* user, char* role, int noroot)
+void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, int id)
 {	
-	struct pam_cap_s pcs;
+	struct pam_cap_s pcs;	
 	
 	/* sr_aux will be used to fill the ambient set of the process and launch the bash.
 	But, if more than 1 user want to use Switch Role at the same time, it's a problem.
 	For this reason, the program make a copy of sr_aux and it will work on it.
-	The copy has an unique name (sr_aux_userName_role). If user is root, the new file will go to /home/
-	else, it will go to /home/username/ */
-	
+	The copy has an unique name (sr_aux_userName_role). */
 	char *srAuxUnique;
-	if (!strcmp(user,"root")) {
+	if (!strcmp("root",getenv("USER")) && strcmp("root",user)) {
 		char *srAux = "sr_aux_";
-		char *home = getenv("HOME");
-		srAuxUnique = malloc(strlen(home) + strlen(srAux) + strlen(user) + strlen(role) + strlen("/") + strlen("_") + 1);
+		char *home = "/usr/bin";
+		srAuxUnique = malloc(strlen(home) + strlen("/") + strlen(srAux) + strlen(user) + strlen(role) + strlen("_") + 1);
 		strcpy(srAuxUnique,home);
 		strcat(srAuxUnique,"/");
 		strcat(srAuxUnique,srAux);
@@ -473,6 +484,11 @@ void fork_setcap(char* user, char* role, int noroot)
 		pcs.role = role;
 		set_capabilities(&pcs);
 		
+		if (id != 0) {
+			prctl(PR_SET_KEEPCAPS,1,0,0,0);
+			setuid(id);
+		}
+		
 		//printf("sr_aux_bis launch\n");
 		/* Here we launch the aux process with the capabilities in P, E and I.
 		It will add the Ambient capabilities and launch the bash */
@@ -487,7 +503,15 @@ void fork_setcap(char* user, char* role, int noroot)
 			rootArg = "root";
 		newargv[1] = rootArg;;
 		newargv[2] = read_capabilities_for_role(user,role);
-		newargv[3] = NULL;
+		
+		char *comArg;
+		if (chkCom)
+			comArg = "yes";
+		else
+			comArg = "no";
+		newargv[3] = comArg;
+		newargv[4] = command;
+		newargv[5] = NULL;
 		execve(newargv[0],newargv,newenviron);
 		perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
 		exit(EXIT_FAILURE);	
@@ -530,20 +554,54 @@ void fork_setcap(char* user, char* role, int noroot)
 }
 
 
+int get_setuid_setgid()
+{
+	cap_t caps;
+	cap_flag_value_t value_setuid;
+	cap_flag_value_t value_setgid;
+	
+	caps = cap_get_proc();
+	if (caps == NULL)
+		perror("No capabilities");
+		
+	cap_get_flag(caps, CAP_SETUID, CAP_EFFECTIVE, &value_setuid);
+	cap_get_flag(caps, CAP_SETGID, CAP_EFFECTIVE, &value_setgid);
+	
+	if ((value_setuid == CAP_SET) || (value_setgid == CAP_SET)) {
+		cap_free(caps);
+		return 1;
+	} else{
+		cap_free(caps);
+		return 0;
+	}
+}
+
+
 int main(int argc, char *argv[])
 {
 	pam_handle_t* pamh = NULL;
 	int retval;
+	
 	char* user;
-
+	int chkUser = 0;
 	char *role;
 	int chkRole = 0;
+	char *command = NULL;
+	int chkCom = 0;
 	int noroot = 0;
 
 	for (int i=1;i<argc;i++) {
 		if (!strcmp(argv[i],"-r")) {
 			role = argv[i+1];
 			chkRole = 1;
+		}
+		if (!strcmp(argv[i],"-u")) {
+			user = argv[i+1];
+			chkUser = 1;
+		}
+		if (!strcmp(argv[i],"-c")) {
+			command = argv[i+1];
+			chkCom = 1;
 		}
 		if (!strcmp(argv[i],"-n"))
 			noroot = 1;
@@ -558,41 +616,65 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	
-	/* username is used for authentification and role access control */
-	user = getenv("USER");
-
-	//printf("User : %s\n",user);
-	
-	retval = pam_start("check_user", user, &conv, &pamh);
-
-	retval = pam_setcred(pamh, 0);
-	// Are the credentials correct?
-	if (retval == PAM_SUCCESS) {
-		set_dac_override();
-		retval = pam_authenticate(pamh, 0);
-	}
-
-	// Can the account be used at this time?
-	if (retval == PAM_SUCCESS) {
-		//printf("Account is valid.\n");
-		retval = pam_acct_mgmt(pamh, 0);
+	int id = 0;
+	if (chkUser) {
+		if (get_setuid_setgid())  {
+			char *echo = "echo `grep ";
+			char *cut = " /etc/passwd | cut -d: -f3`";
+			char *takeId = malloc(strlen(echo) + strlen(cut) + strlen(user) + 1);
+			strcpy(takeId,echo);
+			strcat(takeId,user);
+			strcat(takeId,cut);
+			
+			FILE *fId = popen(takeId, "r"); //Take only the uid of the specified user
+			char *Cid = malloc(sizeof(fId));
+			fgets(Cid,MAX_LEN,fId);
+			
+			free(takeId);
+			pclose(fId);
+			id = atoi(Cid);
+		} else {
+			printf("Can't switch user, cap_setuid and cap_setgid are not set\n");
+			exit(EXIT_FAILURE);
+		}
+		
 	} else{
-		printf("Authentification failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	
-	// Did everything work?
-	if (retval == PAM_SUCCESS) {
-		//printf("Authenticated\n");
-	} else {
-		printf("Not Authenticated\n");
-	}
+		/* username is used for authentification and role access control */
+		user = getenv("USER");
 
-	// close PAM (end session)
-	if (pam_end(pamh, retval) != PAM_SUCCESS) {
-		pamh = NULL;
-		printf("check_user: failed to release authenticator\n");
-		exit(1);
+		//printf("User : %s\n",user);
+		
+		retval = pam_start("check_user", user, &conv, &pamh);
+
+		retval = pam_setcred(pamh, 0);
+		// Are the credentials correct?
+		if (retval == PAM_SUCCESS) {
+			set_dac_override();
+			retval = pam_authenticate(pamh, 0);
+		}
+
+		// Can the account be used at this time?
+		if (retval == PAM_SUCCESS) {
+			//printf("Account is valid.\n");
+			retval = pam_acct_mgmt(pamh, 0);
+		} else{
+			printf("Authentification failed.\n");
+			exit(EXIT_FAILURE);
+		}
+		
+		// Did everything work?
+		if (retval == PAM_SUCCESS) {
+			//printf("Authenticated\n");
+		} else {
+			printf("Not Authenticated\n");
+		}
+
+		// close PAM (end session)
+		if (pam_end(pamh, retval) != PAM_SUCCESS) {
+			pamh = NULL;
+			printf("check_user: failed to release authenticator\n");
+			exit(1);
+		}
 	}
 	
 	set_setpcap();
@@ -601,7 +683,7 @@ int main(int argc, char *argv[])
 	set_setfcap();
 	add_ambient();
 
-	fork_setcap(user,role,noroot);
+	fork_setcap(user,role,noroot,command,chkCom,id);
 	
 	//free(user);
 
