@@ -523,10 +523,7 @@ void fork_setcap(char* user, char* role, int noroot)
 
 	char *s1 = read_capabilities_for_role(user,role);
 	if (s1 == NULL) {
-		if (noroot)
-			printf("You need to specifie a role after the -noroot argument\n");
-		else
-			printf("Role doesn't exist or it's not allowed for this user\n");
+		printf("Role doesn't exist or it's not allowed for this user\n");
 		exit(EXIT_FAILURE);
 	}
 	char *s2 = "+p";
