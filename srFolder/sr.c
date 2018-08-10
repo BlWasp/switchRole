@@ -424,7 +424,7 @@ void fork_setcap(char* user, char* role, int noroot)
 	char *srAuxUnique;
 	if (!strcmp(user,"root")) {
 		char *srAux = "sr_aux_";
-		char *home = "/home/";
+		char *home = getenv("HOME");
 		srAuxUnique = malloc(strlen(home) + strlen(srAux) + strlen(user) + strlen(role) + strlen("_") + 1);
 		strcpy(srAuxUnique,home);
 		strcat(srAuxUnique,srAux);
