@@ -153,6 +153,7 @@ static char* read_capabilities_for_role(char *user, char *role)
 					FILE *fGroup = popen("groups $USER","r");
 					char *listString = malloc(sizeof(fGroup));
 					fgets(listString,MAX_LEN,fGroup);
+					pclose(fGroup);
 
 					char *str, *token;
 					int i = 0;
@@ -189,7 +190,11 @@ static char* read_capabilities_for_role(char *user, char *role)
 					if (found_one || none)
 						break;
 							
-					
+					free(listString);
+					fGroup = popen("groups $USER","r");
+					listString = malloc(sizeof(fGroup));
+					fgets(listString,MAX_LEN,fGroup);
+					pclose(fGroup);
 					while (lineTer = strtok_r(NULL, TOK_FLOAT, &saveptr2)) {
 						i = 0;
 						for (str = listString;i<2;i++,str = NULL) {
@@ -224,7 +229,6 @@ static char* read_capabilities_for_role(char *user, char *role)
 					}
 					free(listString);
 					free(list);
-					pclose(fGroup);
 				}
 				
 				cpt++;
