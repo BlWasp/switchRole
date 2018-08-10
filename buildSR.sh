@@ -25,5 +25,3 @@ sudo chmod 644 /etc/security/capabilityRole.conf || exit
 echo "Remove useless installation file"
 rm capabilityRole.conf || exit
 rm srFolder/sr || exit
-
-echo "Please restart your computer to make changes effective"
