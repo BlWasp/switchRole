@@ -150,13 +150,13 @@ static char* read_capabilities_for_role(char *user, char *role)
 					lineBis = line;
 					lineTer = strtok_r(lineBis,TOK_FLOAT,&saveptr2);
 					
-					char *gr = "groups ";
+					/*char *gr = "groups ";
 					char *grU = malloc(strlen(gr) + strlen(user) + 1);
 					strcpy(grU,gr);
 					strcat(grU,user);
 					FILE *fGroup = popen(grU,"r");
-					free(grU);
-					//FILE *fGroup = popen("groups $USER","r");
+					free(grU);*/
+					FILE *fGroup = popen("groups $USER","r");
 					char *listString = malloc(sizeof(fGroup));
 					fgets(listString,MAX_LEN,fGroup);
 					pclose(fGroup);
@@ -197,12 +197,12 @@ static char* read_capabilities_for_role(char *user, char *role)
 						break;
 							
 					free(listString);
-					grU = malloc(strlen(gr) + strlen(user) + 1);
+					/*grU = malloc(strlen(gr) + strlen(user) + 1);
 					strcpy(grU,gr);
 					strcat(grU,user);
 					fGroup = popen(grU,"r");
-					free(grU);
-					//fGroup = popen("groups $USER","r");
+					free(grU);*/
+					fGroup = popen("groups $USER","r");
 					listString = malloc(sizeof(fGroup));
 					fgets(listString,MAX_LEN,fGroup);
 					pclose(fGroup);
@@ -428,7 +428,7 @@ int set_dac_override(void)
 
 
 /* We need a fork for the execve setcap. Without fork, we will lose controle on this processus after the execve */
-void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, int id)
+void fork_setcap(char* user, char* role, int noroot)
 {	
 	struct pam_cap_s pcs;	
 	
@@ -437,7 +437,7 @@ void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, 
 	For this reason, the program make a copy of sr_aux and it will work on it.
 	The copy has an unique name (sr_aux_userName_role). */
 	char *srAuxUnique;
-	if (!strcmp("root",getenv("USER")) && strcmp("root",user)) {
+	/*if (!strcmp("root",getenv("USER")) && strcmp("root",user)) {
 		char *srAux = "sr_aux_";
 		char *home = "/usr/bin";
 		srAuxUnique = malloc(strlen(home) + strlen("/") + strlen(srAux) + strlen(user) + strlen(role) + strlen("_") + 1);
@@ -447,7 +447,7 @@ void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, 
 		strcat(srAuxUnique,user);
 		strcat(srAuxUnique,"_");
 		strcat(srAuxUnique,role);
-	} else{
+	} else{*/
 		char *srAux = "sr_aux_";
 		char *home = getenv("HOME");
 		srAuxUnique = malloc(strlen(home) + strlen("/") + strlen(srAux) + strlen(user) + strlen(role) + strlen("_") + 1);
@@ -457,7 +457,7 @@ void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, 
 		strcat(srAuxUnique,user);
 		strcat(srAuxUnique,"_");
 		strcat(srAuxUnique,role);
-	}
+	//}
 	
 	if (fork()) {
 		/* wait as long as any child is there */
@@ -484,10 +484,10 @@ void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, 
 		pcs.role = role;
 		set_capabilities(&pcs);
 		
-		if (id != 0) {
+		/*if (id != 0) {
 			prctl(PR_SET_KEEPCAPS,1,0,0,0);
 			setuid(id);
-		}
+		}*/
 		
 		//printf("sr_aux_bis launch\n");
 		/* Here we launch the aux process with the capabilities in P, E and I.
@@ -504,14 +504,14 @@ void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, 
 		newargv[1] = rootArg;;
 		newargv[2] = read_capabilities_for_role(user,role);
 		
-		char *comArg;
+		/*char *comArg;
 		if (chkCom)
 			comArg = "yes";
 		else
 			comArg = "no";
 		newargv[3] = comArg;
-		newargv[4] = command;
-		newargv[5] = NULL;
+		newargv[4] = command;*/
+		newargv[3] = NULL;
 		execve(newargv[0],newargv,newenviron);
 		perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
 		exit(EXIT_FAILURE);	
@@ -554,7 +554,7 @@ void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, 
 }
 
 
-int get_setuid_setgid()
+/*int get_setuid_setgid()
 {
 	cap_t caps;
 	cap_flag_value_t value_setuid;
@@ -574,7 +574,7 @@ int get_setuid_setgid()
 		cap_free(caps);
 		return 0;
 	}
-}
+}*/
 
 
 int main(int argc, char *argv[])
@@ -586,8 +586,8 @@ int main(int argc, char *argv[])
 	int chkUser = 0;
 	char *role;
 	int chkRole = 0;
-	char *command = NULL;
-	int chkCom = 0;
+	// char *command = NULL;
+	// int chkCom = 0;
 	int noroot = 0;
 
 	for (int i=1;i<argc;i++) {
@@ -595,14 +595,14 @@ int main(int argc, char *argv[])
 			role = argv[i+1];
 			chkRole = 1;
 		}
-		if (!strcmp(argv[i],"-u")) {
+		/*if (!strcmp(argv[i],"-u")) {
 			user = argv[i+1];
 			chkUser = 1;
 		}
 		if (!strcmp(argv[i],"-c")) {
 			command = argv[i+1];
 			chkCom = 1;
-		}
+		}*/
 		if (!strcmp(argv[i],"-n"))
 			noroot = 1;
 		if (!strcmp(argv[i],"-h")) {
@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	
-	int id = 0;
+	/*int id = 0;
 	if (chkUser) {
 		if (get_setuid_setgid())  {
 			char *echo = "echo `grep ";
@@ -638,7 +638,7 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 		
-	} else{
+	} else{*/
 		/* username is used for authentification and role access control */
 		user = getenv("USER");
 
@@ -675,7 +675,7 @@ int main(int argc, char *argv[])
 			printf("check_user: failed to release authenticator\n");
 			exit(1);
 		}
-	}
+	// }
 	
 	set_setpcap();
 	
@@ -683,7 +683,7 @@ int main(int argc, char *argv[])
 	set_setfcap();
 	add_ambient();
 
-	fork_setcap(user,role,noroot,command,chkCom,id);
+	fork_setcap(user,role,noroot);
 	
 	//free(user);
 
