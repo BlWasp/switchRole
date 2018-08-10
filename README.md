@@ -51,12 +51,6 @@ You have the possibility to launch a full capabale shell that doesn't give any s
 
 We use the securebits to provide this functionality. Any set-uid-root program will be run without having any special effect. So in the shell, you can't for example use the ping command without a role that has cap_net_raw privilege.
 
-**Service managment**
-
-Any user who has cap_setuid or cap_setgid (typically this is the root) can assume the roles of other users without passing by the authentication phase. This option is convenient more for the services . In this mode, you should determine the username, role name and the command (you can also add the noroot option) :
-
-`sr -r role1 -u username -c command`
-
 
 Motivation scenarios
 ===========
