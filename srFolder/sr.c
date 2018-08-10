@@ -531,9 +531,26 @@ int main(int argc, char *argv[])
 	int retval;
 	char* user;
 
-	if(argc != 3 && argc != 2) {
-		printf("Usage: [-noroot] role\n");
-		exit(1);
+	char *role;
+	int chkRole = 0;
+	int noroot = 0;
+
+	for (int i=1;i<argc;i++) {
+		if (!strcmp(argv[i],"-r")) {
+			role = argv[i+1];
+			chkRole = 1;
+		}
+		if (!strcmp(argv[i],"-n"))
+			noroot = 1;
+		if (!strcmp(argv[i],"-h")) {
+			printf("Usage : sr -r role [-n]\n");
+			exit(EXIT_SUCCESS);
+		}
+	}
+	
+	if (!chkRole) {
+		printf("Usage : sr -r role [-n]\n");
+		exit(EXIT_FAILURE);
 	}
 	
 	/* username is used for authentification and role access control */
@@ -576,19 +593,6 @@ int main(int argc, char *argv[])
 	set_setpcap();
 	
 	/* child will set capabilities and launch sr_aux */
-	int noroot = 0;
-	char *role;
-	if (!strcmp("-noroot",argv[1])) { //If user want to launch a bash without the capacity to become root, use setuid bit, etc
-		if (argc != 3) {
-			printf("Please give a role after the -noroot argument\n");
-			exit(EXIT_FAILURE);
-		}
-		role = argv[2];
-		noroot = 1;
-	} else{
-		role = argv[1];
-	}
-
 	set_setfcap();
 	add_ambient();
 
