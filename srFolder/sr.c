@@ -511,7 +511,7 @@ void fork_setcap(char* user, char* role, int noroot, char* command, int chkCom, 
 			comArg = "no";
 		newargv[3] = comArg;
 		newargv[4] = command;
-		newargv[3] = NULL;
+		newargv[5] = NULL;
 		execve(newargv[0],newargv,newenviron);
 		perror("execve");   /* execve() ne retourne qu'en cas d'erreur */
 		exit(EXIT_FAILURE);	
