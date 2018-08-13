@@ -4,6 +4,8 @@ Guillaume Daumas : guillaume.daumas@univ-tlse3.fr
 
 Ahmad Samer Wazan : ahmad-samer.wazan@irit.fr
 
+Rémi Venant: remi.venant@gmail.com
+
 
 
 Intro
