@@ -5,6 +5,7 @@ sudo apt-get install libcap2 || exit
 sudo apt-get install libcap2-bin || exit
 sudo apt-get install libcap-ng-dev || exit
 sudo apt-get install libcap-dev || exit
+sudo apt-get install gcc || exit
 
 echo "Installation PAM"
 sudo apt-get install libpam0g-dev || exit
