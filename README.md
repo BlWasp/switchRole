@@ -132,7 +132,7 @@ Scenario 3
 -----
 an administrator wants to attribute a user the privilege to run an apache server. Without our module, the administrator can use either setcap command to inject the necessary privilege in the binary of apache server (option1) or use pam_cap.so module and setcap command (option2). Both options have problems: All systems' users will get this privilege in the case of option 1. The configuration of the binary apache will be lost after updating the apache package. 
 
-To achieve this obective using our module, an admininstrator should follow the following steps:
+To achieve this objective using our module, an admininstrator should follow the following steps:
 
 1- Grant the privilege cap_bet_bind_service, cap_dac_override to the user by editing capabilityRole.conf file. Note that cap_dac_override is not mandatory if the administraor changes the ownership of the log files.
 
@@ -149,6 +149,8 @@ sr -r role1  -c 'runapache.sh'
 Scenario 4 
 -----
 Two developers create a shared folder in which they stored a common program that they develop together. This program requires cap_net_raw privilege. The developers have to mount their shared folder using NFS v3.  This scenario is not feasible with the current tools because NFS v3 doesn’t support extended attributes. 
+
+
 
 NoRoot Scenario 
 -----
@@ -183,7 +185,7 @@ If we modify the configuration to assign role1 that conains cap_net_raw privileg
 
 ![Screenshot](scenarioNoRoot/rootRole1NoRootPing.png).
 
-Service Managemnt Scenario 
+Service Managment Scenario 
 -----
 
 An administrator wants to launch a set of services like apache and ssh by giving them only the privileges that they need. (S)he may use the command setcap or pam_cap.so to define the necessary privileges in the binary of each service. However all configuration will be lost after an update.
