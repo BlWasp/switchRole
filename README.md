@@ -136,8 +136,7 @@ To achieve this objective using our module, an admininstrator should follow the 
 
 1- Grant the privilege cap_bet_bind_service, cap_dac_override to the user by editing capabilityRole.conf file. Note that cap_dac_override is not mandatory if the administraor changes the ownership of the log files.
 
-2- Define a script (lets call it runapache.sh) that has the follwing commands: source /etc/apache2/envvars
-						   /usr/sbin/apache2
+2- Define a script (lets call it runapache.sh) that has the following commands: source /etc/apache2/envvars and /usr/sbin/apache2
 						   
 3-User can assume the role and run the apache service using the command sr:
 sr -r role1  -c 'runapache.sh'
