@@ -133,9 +133,12 @@ Scenario 3
 an administrator wants to attribute a user the privilege to run an apache server. Without our module, the administrator can use either setcap command to inject the necessary privilege in the binary of apache server (option1) or use pam_cap.so module and setcap command (option2). Both options have problems: All systems' users will get this privilege in the case of option 1. The configuration of the binary apache will be lost after updating the apache package. 
 
 To achieve this obective using our module, an admininstrator should follow the following steps:
+
 1- Grant the privilege cap_bet_bind_service, cap_dac_override to the user by editing capabilityRole.conf file. Note that cap_dac_override is not mandatory if the administraor changes the ownership of the log files.
+
 2- Define a script (lets call it runapache.sh) that has the follwing commands: source /etc/apache2/envvars
 						   /usr/sbin/apache2
+						   
 3-User can assume the role and run the apache service using the command sr:
 sr -r role1  -c 'runapache.sh'
 
@@ -186,10 +189,14 @@ Service Managemnt Scenario
 An administrator wants to launch a set of services like apache and ssh by giving them only the privileges that they need. (S)he may use the command setcap or pam_cap.so to define the necessary privileges in the binary of each service. However all configuration will be lost after an update.
 
 To launch the apache service using our module, an admininstrator should follow the following steps:
+
 1- Grant the privilege cap_bet_bind_service to the user by editing capabilityRole.conf file,
+
 2- Define a script (lets call it runapache.sh) that has the follwing commands: source /etc/apache2/envvars
 						   /usr/sbin/apache2
+						   
 3-as a root, run the follwing command:
+
 sr -r role1 -u apacheuser -n -c 'runapache.sh'
 
 4-verify that the apache process has only the cap_net_bind_service in its effective using this command: cat /proc/PID/status
