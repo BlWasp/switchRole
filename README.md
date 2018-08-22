@@ -27,10 +27,13 @@ How to Build
     
     2. cd switchRole
     
-    3. execute the following installation script as root :
-		`sh ./buildSR.sh`
+    3. ./configure.sh
     
-    4. restart your system.
+    4. make
+    
+    5. sudo make install
+    
+    6. restart your system.
 
 Usage
 -----

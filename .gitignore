@@ -1,0 +1,5 @@
+#Gitignore file
+
+#application, object files
+obj/
+bin/
