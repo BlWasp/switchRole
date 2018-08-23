@@ -67,7 +67,7 @@ A user contacts his administrator to give him a privilege that allows him runnin
 
 Here a simple python script that needs to bind a server on the port 80 [9] (the user running the script needs CAP_NET_BIND_SERVICE to do that).
 
-![Screenshot](scenarioPython/codeServer.png)
+![Screenshot](doc/scenarioPython/codeServer.png)
 
 
 If we try to execute the script without any privilege, we get the expected 'Permission denied'.
