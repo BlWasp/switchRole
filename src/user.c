@@ -183,8 +183,10 @@ int get_group_names(const char *user, gid_t group, int *nb_groups,
   goto free_rsc;
   
   on_error:
-    if(*groups != NULL)
+    if(*groups != NULL){
         free(*groups);
+        *groups = NULL;
+    }
     *nb_groups = 0;
   free_rsc:
     if(gps != NULL)

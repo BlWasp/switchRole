@@ -131,7 +131,9 @@ int get_permitted_caps(int *nb_caps, cap_value_t **caps){
     }
     if (*caps != NULL){
         free(*caps);
+        *caps = NULL;
     }
+    *nb_caps = 0;
 	return -1;
 }
 
@@ -181,7 +183,9 @@ int get_ambient_caps_candidates(int *nb_caps, cap_value_t **caps){
     }
     if (*caps != NULL){
         free(*caps);
+        *caps = NULL;
     }
+    *nb_caps = 0;
 	return -1;
 }
 
