@@ -249,7 +249,7 @@ void print_urc(const user_role_capabilities_t *urc){
             if(cap_name == NULL){
                 printf("Cannot have cap name for %d\n", urc->caps.capabilities[i]);
             }else{
-                printf("%ld: %s\n", urc->caps.capabilities[i], cap_name);
+                printf("%d: %s\n", urc->caps.capabilities[i], cap_name);
             }
             cap_free(cap_name);
         }

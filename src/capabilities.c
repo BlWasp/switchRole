@@ -96,6 +96,7 @@ int get_permitted_caps(int *nb_caps, cap_value_t **caps){
     cap_t proc_caps = NULL; //capabilities state of the process
 	cap_value_t c; //a capability candidate
 	cap_flag_value_t fval_permitted; //Value of a cap's flag
+	int ret_cap_get_flag;
 	
 	//Init out parameters
 	*nb_caps = 0;
@@ -112,8 +113,16 @@ int get_permitted_caps(int *nb_caps, cap_value_t **caps){
 		if(!CAP_IS_SUPPORTED(c)) continue;
 		//Retrieve the flags for this cap in the permitted and inheritable
 		//sets of the current process
-		if(cap_get_flag(proc_caps, c, CAP_PERMITTED, 
-		                &fval_permitted)) goto on_error;	
+		ret_cap_get_flag = cap_get_flag(proc_caps, c, CAP_PERMITTED, 
+		                                &fval_permitted);
+        if(ret_cap_get_flag == -1){
+            if(errno == EINVAL){
+                //fix bug on inconsistence btwn linux headers def and kernel
+                continue;
+            }else{
+                goto on_error;	
+            }
+        }
 		//check that the cap is in permitted set
 		if(fval_permitted == CAP_SET){
 		    *(*caps + (*nb_caps)++) = c;
@@ -163,9 +172,26 @@ int get_ambient_caps_candidates(int *nb_caps, cap_value_t **caps){
 		if(!CAP_IS_SUPPORTED(c)) continue;
 		//Retrieve the flags for this cap in the permitted and inheritable
 		//sets of the current process
-		if(cap_get_flag(proc_caps, c, CAP_INHERITABLE, &fval_inheritable)
-		        || cap_get_flag(proc_caps, c, CAP_PERMITTED, &fval_permitted))
-			goto on_error;	
+		ret_cap_get_flag = cap_get_flag(proc_caps, c, CAP_INHERITABLE, 
+		                                &fval_inheritable);
+        if(ret_cap_get_flag == -1){
+            if(errno == EINVAL){
+                //fix bug on inconsistence btwn linux headers def and kernel
+                continue;
+            }else{
+                goto on_error;	
+            }
+        }
+        ret_cap_get_flag = cap_get_flag(proc_caps, c, CAP_PERMITTED, 
+		                                &fval_permitted);
+        if(ret_cap_get_flag == -1){
+            if(errno == EINVAL){
+                //fix bug on inconsistence btwn linux headers def and kernel
+                continue;
+            }else{
+                goto on_error;	
+            }
+        }	
 		//check that the cap is in inheritable and permitted sets
 		if(fval_inheritable == CAP_SET && fval_inheritable == CAP_SET){
 		    *(*caps + (*nb_caps)++) = c;
