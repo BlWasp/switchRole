@@ -1,6 +1,7 @@
 #Makefile for sr
 #Author: Rémi Venant
 COMP = gcc
+COPTS = -Wall -pedantic
 
 SRC_DIR := src
 OBJ_DIR := obj
@@ -18,7 +19,7 @@ all: $(BINS)
 .PHONY: clean
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
-	$(COMP) -c $<
+	$(COMP) $(COPTS) -c $<
 
 $(OBJS): | $(OBJ_DIR)
 
@@ -26,10 +27,10 @@ $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 
 $(BIN_DIR)/sr: $(addprefix $(SRC_DIR)/,capabilities.o roles.o sr.o sraux_management.o user.o)
-	$(COMP) -o $@ $^ $(LDOPTIONS) $(SR_LDOPTIONS)
+	$(COMP) $(COPTS) -o $@ $^ $(LDOPTIONS) $(SR_LDOPTIONS)
 
 $(BIN_DIR)/sr_aux: $(addprefix $(SRC_DIR)/,capabilities.o sr_aux.o)
-	$(COMP) -o $@ $^ $(LDOPTIONS) 
+	$(COMP) $(COPTS) -o $@ $^ $(LDOPTIONS) 
 
 $(BINS): | $(BIN_DIR)
 
