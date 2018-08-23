@@ -18,18 +18,18 @@ all: $(BINS)
 
 .PHONY: clean
 
-$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
-	$(COMP) $(COPTS) -c $<
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c | $(OBJ_DIR)
+	$(COMP) $(COPTS) -o $@ -c $<
 
 $(OBJS): | $(OBJ_DIR)
 
 $(OBJ_DIR):
 	mkdir $(OBJ_DIR)
 
-$(BIN_DIR)/sr: $(addprefix $(SRC_DIR)/,capabilities.o roles.o sr.o sraux_management.o user.o)
+$(BIN_DIR)/sr: $(addprefix $(OBJ_DIR)/,capabilities.o roles.o sr.o sraux_management.o user.o) | $(BIN_DIR)
 	$(COMP) $(COPTS) -o $@ $^ $(LDOPTIONS) $(SR_LDOPTIONS)
 
-$(BIN_DIR)/sr_aux: $(addprefix $(SRC_DIR)/,capabilities.o sr_aux.o)
+$(BIN_DIR)/sr_aux: $(addprefix $(OBJ_DIR)/,capabilities.o sr_aux.o) | $(BIN_DIR)
 	$(COMP) $(COPTS) -o $@ $^ $(LDOPTIONS) 
 
 $(BINS): | $(BIN_DIR)

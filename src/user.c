@@ -45,7 +45,6 @@ Return the user id, or -1 if the user does not exist or an error has occured.
 */
 uid_t get_user_id(const char* user){
     struct passwd *info_user;
-    int user_id;
 
     if((info_user = getpwnam(user)) == NULL){
         return -1;

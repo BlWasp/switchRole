@@ -288,6 +288,7 @@ static int findSubstr(const char *inpText, const char *pattern) {
 
         inpText++;
     }
+    return 0;
 }
 
 /* Read the role's capabilities */
