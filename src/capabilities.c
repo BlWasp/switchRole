@@ -156,6 +156,7 @@ int get_ambient_caps_candidates(int *nb_caps, cap_value_t **caps){
 	cap_t proc_caps = NULL; //capabilities state of the process
 	cap_value_t c; //a capability candidate
 	cap_flag_value_t fval_inheritable, fval_permitted; //values of cap's flags
+	int ret_cap_get_flag;
 	
 	//Init out parameters
 	*nb_caps = 0;
