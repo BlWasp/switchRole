@@ -33,8 +33,6 @@ How to Build
     
     5. sudo make install
     
-    6. restart your system.
-
 Usage
 -----
 
