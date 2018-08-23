@@ -71,25 +71,25 @@ Here a simple python script that needs to bind a server on the port 80 [9] (the 
 
 
 If we try to execute the script without any privilege, we get the expected 'Permission denied'.
-![Screenshot](scenarioPython/connectionFailed.png)
+![Screenshot](doc/scenarioPython/connectionFailed.png)
 
 
 The first solution consists in using the setcap command in order to attribute the cap_net_bind_service capability to the python interpreter. Doing this create a security problem; now users present in the same system have the same privilege. 
-![Screenshot](scenarioPython/connectionWithSetcap.png)
+![Screenshot](doc/scenarioPython/connectionWithSetcap.png)
 
 The second solution is to use pam_cap.so module, as follows:
 
 The administrator sets cap_net_bind_service in the /etc/security/capability.conf file (pam_cap's configuration file).
 
-![Screenshot](scenarioPython/pam_capConf.png)
+![Screenshot](doc/scenarioPython/pam_capConf.png)
 
 As you see, the inheriable set of the shell has now the new capability.
 
-![Screenshot](scenarioPython/bashPamCap.png)
+![Screenshot](doc/scenarioPython/bashPamCap.png)
 
 The administrator has to use setcap command to inject cap_net_bind_service in the Effective and Inheritable set of the interpreter. After that the user can run the script.
 
-![Screenshot](scenarioPython/connectionWithPamCap.png)
+![Screenshot](doc/scenarioPython/connectionWithPamCap.png)
 
 However, in this case all scripts run by the same user will have the same privilege :(
 
@@ -99,7 +99,7 @@ Our solution provides a better alternative. Suppose that the capabilityRole.conf
 Then the user needs only to assume role1 using our sr tool and then run his (her) script. (S)he can use other shell to run the other non-privileged scripts.
 
 
-![Screenshot](scenarioPython/connectionWithRole.png)
+![Screenshot](doc/scenarioPython/connectionWithRole.png)
 
 
 
@@ -111,23 +111,23 @@ Suppose a developer wants to test a program that (s)he has developed in order to
 
 This is an example program which tries to open a raw socket (cap_net_raw needed) [10]:
 
-![Screenshot](scenarPreload/codeSocket.png)
+![Screenshot](doc/scenarPreload/codeSocket.png)
 
 This is a code which tries to intercept the socket() call [10].
 
-![Screenshot](scenarPreload/codeCapture.png)
+![Screenshot](doc/scenarPreload/codeCapture.png)
 
 As we can see, we need cap_net_raw to open this socket.
 
-![Screenshot](scenarPreload/socketWithoutWithSetcap.png)
+![Screenshot](doc/scenarPreload/socketWithoutWithSetcap.png)
 
 But, when the LD_PRELOAD is configured, Linux kernel disable the interception of socket() call. The following figure shows how the interception works correctly after having removed the capability from the binary file (setcap -r), and not correctly when the capacity is re-added to the binary file.
 
-![Screenshot](scenarPreload/preloadWithoutWithSetcap.png)
+![Screenshot](doc/scenarPreload/preloadWithoutWithSetcap.png)
 
 With our module, no need set the capability in the binary file: you can open the socket and intercept the connection.
 
-![Screenshot](scenarPreload/preloadWithRole.png)
+![Screenshot](doc/scenarPreload/preloadWithRole.png)
 
 
 
@@ -160,13 +160,13 @@ With -n option the kernel considers the root user as any normal user.
 
 Here, the sr tool is launched with the root user but without -n : 
 
-![Screenshot](scenarioNoRoot/rootWithoutNoroot.png)
+![Screenshot](doc/scenarioNoRoot/rootWithoutNoroot.png)
 
 as you see, the root user obtains the full list of privileges.
 
 Here is the result when we add the -noroot option : 
 
-![Screenshot](scenarioNoRoot/rootNorootRole1.png)
+![Screenshot](doc/scenarioNoRoot/rootNorootRole1.png)
 
 As you see now, the root user didn't obtain the full list of privileges.
 
@@ -174,18 +174,18 @@ Under this mode, set-uid-root programs will not have the full list of privileges
 
 For example, lets check result of the ping program. Suppose that we assign the role2 to root user as follows:
 
-![Screenshot](scenarioNoRoot/rootConfRole2.png)
+![Screenshot](doc/scenarioNoRoot/rootConfRole2.png)
 
 When the root user assume the role2 with -noroot option, he can't use `ping 0` because cap_net_raw is not present its role.
 
-![Screenshot](scenarioNoRoot/rootRole2NoRootCantPing.png)
+![Screenshot](doc/scenarioNoRoot/rootRole2NoRootCantPing.png)
 
 If we modify the configuration to assign role1 that conains cap_net_raw privilege to root user, we see that he can now use ping:
 
-![Screenshot](scenarioNoRoot/rootConfRole1.png)
+![Screenshot](doc/scenarioNoRoot/rootConfRole1.png)
 
 
-![Screenshot](scenarioNoRoot/rootRole1NoRootPing.png).
+![Screenshot](doc/scenarioNoRoot/rootRole1NoRootPing.png).
 
 Service Managment Scenario 
 -----
@@ -209,11 +209,11 @@ How sr works
 ===========
 You might be interested to know how we implement the sr tool. So here is the algorithm: 
 
-![Screenshot](algorithm2.jpg)
+![Screenshot](doc/algorithm2.jpg)
 
 In terms of capabilities calucations by Linux Kernel, here is what happens:
 
-![Screenshot](calculations.jpg)
+![Screenshot](doc/calculations.jpg)
 
 
 References
