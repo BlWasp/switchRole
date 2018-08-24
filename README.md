@@ -29,8 +29,7 @@ How to Build
     
     3. execute the following installation script as root :
 		`sh ./buildSR.sh`
-    
-    4. restart your system.
+   
 
 Usage
 -----
