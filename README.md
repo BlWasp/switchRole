@@ -11,7 +11,8 @@ Guillaume Daumas : guillaume.daumas@univ-tlse3.fr
 Intro
 =====
 
-Root As Role (RAR) module implements a role based approach for distributing Linux capabilities into Linux users. It allows assigning Linux capabilities to Linux users without the need to inject the Linux capabilities into executable files. Our code is a PAM-based module that leverages a new capability set added to Linux kernel, called Ambient Set. Using this module, administrators can group a set of Linux capabilities in roles and give them to their users. For security reasons, users don’t get the attributed roles by default, they should activate them using the command sr (switch role). Our module is compatible with pam_cap.so. So administrators can continue using pam_cap.so along with our module.
+Root As Role (RAR) module implements a role based approach for distributing Linux capabilities into Linux users. It allows assigning Linux capabilities to Linux users without the need to inject the Linux capabilities into executable files. Our module leverages a new capability set added to Linux kernel, called Ambient Set. Using this module, administrators can group a set of Linux capabilities in roles and give them to their users. For security reasons, users don’t get the attributed roles by default, they should activate them using the command sr (switch role). Our module is compatible with pam_cap.so. So administrators can continue using pam_cap.so along with our module. Concretely, with our module users can stop using su and sudo commands. They should use instead the sr tool that allows them to assume roles that contains root privileges to run their programs. The advantage is that sr tool doesn't give the whole list of privileges to the run programs. This allows respecting the least privilege principle.  
+
 
 Tested Platforms
 ===========
@@ -36,15 +37,18 @@ How to Build
 Usage
 -----
 
-After the installation you will find a file called capabilityRole.conf in the /etc/security directory. You should configure this file in order to define the set of roles and assign them to users or group of users on your system.
+After the installation you will find a file called capabilityRole.conf in the /etc/security directory. You should configure this file in order to define the set of roles and assign them to users or group of users on your system. Once configuration is done, a user can assume a role using the ‘sr’ tool  that is installed with our package.
 
 **assume Roles**
 
-Once configuration is done, a user can assume a role using the ‘sr’ tool  that is installed with our package. In your shell type for example :
+ The role root is defined by default with the list of all privileges. To assume the role Root, type in your shell the following command :
+`sr -r root` 
 
-`sr -r role1` 
+After that a new shell is openned. This shell contains the capabilities of the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you make an exit() you retrun to your initial shell without any privilege.
 
-After that a new shell is openned. This shell contains the capabilities of the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you make an exit() you retrun to your initial shell without any privilege. 
+Of course, other roles can be defined by modifying the capabilityRole.conf, you can also limit the utilisation of some roles to certain programs. In this case, you can assume a role for executing one program by adding the "-c" option. For example:
+
+`sr -r role1 -c /bin/tcpdump`
 
 **No Root mode**
 
