@@ -18,6 +18,7 @@
 #include <sys/wait.h>
 #include <sys/prctl.h>
 #include <signal.h>
+#include <libxml/parser.h>
 
 /*
 Print Help message
@@ -47,7 +48,8 @@ The user-role must be deallocated by free_urc() afterwards.
 Return the user-role pointer on success, or NULL on failure
 */
 static user_role_capabilities_t *retrieve_urc(const char* role, 
-        const char* user, const char *command, uid_t user_id, gid_t group_id);
+        const char* user, const char *command, uid_t user_id, gid_t group_id,
+        int print_urc_info);
 
 /*
 Mask/Unmasks signals to prevent stopping the father until the child is done
@@ -68,6 +70,7 @@ int main(int argc, char *argv[])
     char *user = NULL; //the user to use
     char *command = NULL; //the command to execute
     int noroot = 0; //the no-root indicator
+    int print_urc_info; //option indicator to print role info and quit
     uid_t user_id; //the user id that will be used
     gid_t group_id; //the user group Id that will be used
     int change_user_required; //a indicator that we need to change user
@@ -92,6 +95,10 @@ int main(int argc, char *argv[])
 		if (!strcmp(argv[i], "-n")){
 			noroot = 1;
 			continue;
+        }
+        if(!strcmp(argv[i], "-i")){
+            print_urc_info = 1;
+            continue;
         }
 		if (!strcmp(argv[i],"-h")) {
 			print_help(1);
@@ -127,9 +134,16 @@ int main(int argc, char *argv[])
 	}
 	
 	//Retrieve the user capabilities from role (depending of the command)
-	if((urc = retrieve_urc(role, user, command, user_id, group_id)) == NULL){
+	//Print role info if print_urc_info == 1
+	if((urc = retrieve_urc(role, user, command, user_id, group_id, 
+	                        print_urc_info)) == NULL){
         goto free_rscs;
     }
+	if(print_urc_info){
+	    //Quit here
+	    return_code = EXIT_SUCCESS;
+	    goto free_rscs;
+	}
 
 	//Create a temporary sr_aux with the given capabilities
 	if((sr_aux_filepath = create_sr_aux_temp(user, urc, 
@@ -218,6 +232,7 @@ static void print_help(int long_help){
         printf("\t-n: execute the bash or the command without the possibility to increase privilege (e.g.: sudo).\n");
         printf("\t-c command: launch the command instead of a bash shell.\n");
         printf("\t-u user: substitue the user (reserved to administrators).\n");
+        printf("\t-i: print the command the user is able to process within the role and quit.\n");
         printf("\t-h: print this help and quit.\n");
     }
 }
@@ -316,6 +331,7 @@ static int verify_user(char **user, uid_t *user_id, gid_t *group_id,
   free_rscs_on_error:
     if(effective_user_name != NULL) free(effective_user_name);
     if(*user != NULL) free(*user);
+    *user = NULL;
     return -1;
 }
 
@@ -327,7 +343,8 @@ The user-role must be deallocated by free_urc() afterwards.
 Return the user-role pointer on success, or NULL on failure
 */
 static user_role_capabilities_t *retrieve_urc(const char* role, 
-        const char* user, const char *command, uid_t user_id, gid_t group_id){
+        const char* user, const char *command, uid_t user_id, gid_t group_id,
+        int print_urc_info){
     user_role_capabilities_t *urc = NULL;
     int nb_groups;
     char **groups_names = NULL;
@@ -340,27 +357,45 @@ static user_role_capabilities_t *retrieve_urc(const char* role,
     }
     
     //Retrieve the user capabilities from role (depending of the command)
-	if (command == NULL){
-        //If no command, we used bash as the requested command
-        ret_val = init_urc_command(role, BASH, user, nb_groups, groups_names, &urc);
-	}else{
-        ret_val = init_urc_command(role, command, user, nb_groups, groups_names, &urc);
-	}
-	if(ret_val){
+	if(init_urc_command(role, command, user, nb_groups, groups_names, &urc)){
         perror("Unable to init user role capabilities\n");
         goto free_on_error;
 	}
-	if(get_capabilities(urc)){
-        perror("Unable to retrieve capabilities configuration");
-        goto free_on_error;
+	//Initialize the libxml parsing lib
+	xmlInitParser();
+	if(!print_urc_info){
+	    //Retrieve capabilities
+	    ret_val = get_capabilities(urc);
+	}else{
+	    //Print role info for the user
+	    ret_val = print_capabilities(urc);
 	}
-	if(command == NULL){
-	    //We force the command in the urc structure as the given (or not) command
-	    //to avoid launching a bash in a bash
-	    remove_urc_command(urc);
+	//Free the libxml parsing lib
+	xmlCleanupParser();
+	//Process returned value of get_capabilities
+	switch(ret_val){
+	    case 0:
+	        goto free_rscs;
+            break;
+        case -2:
+            perror("Missing given role or user");
+            break;
+        case -3:
+            perror("Missing configuration file or syntax error in it");
+            break;
+        case -4:
+            perror("Invalid configuration file");
+            break;
+        case -5:
+            perror("The role does not exist");
+            break;
+        case -6:
+            perror("This role cannot be used with your user or your groups");
+            break;
+        default:
+            perror("An unmanaged error occured");
+            break;
 	}
-	
-	goto free_rscs;
 	
   free_on_error:
     if(urc != NULL){
