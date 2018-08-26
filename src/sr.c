@@ -101,7 +101,8 @@ int main(int argc, char *argv[])
 	}
 	if(args.help){
 	    print_help(1);
-		exit(EXIT_SUCCESS);
+	    return_code = EXIT_SUCCESS;
+		goto free_rscs;
 	}
     //Assert a role has been given
 	if (args.role == NULL){
@@ -115,8 +116,7 @@ int main(int argc, char *argv[])
     print_debug_resume();
     #endif
 	
-	//If a user has been given, check if the current process has the
-	//capabilities to set uid or gid, then retrieve the user's id
+	//Authenticate / verify given user
 	//user will have to be dealloced afterwards
 	if(verify_user(&args.user, &user_id, &group_id, 
 	                &change_user_required)) goto free_rscs;
@@ -128,13 +128,13 @@ int main(int argc, char *argv[])
 	}
 	
 	//Retrieve the user capabilities from role (depending of the command)
-	//Print role info if print_urc_info == 1
+	//Print role info if info required
 	if((urc = retrieve_urc(args.role, args.user, args.command, user_id, 
 	                    group_id, args.info)) == NULL){
         goto free_rscs;
     }
 	if(args.info){
-	    //Quit here
+	    //Quit here if info required
 	    return_code = EXIT_SUCCESS;
 	    goto free_rscs;
 	}
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
         }
         //if root uses an other user, keep capabilities and set uid
         if(change_user_required){ 
-            //Remeber that we are going to loose all caps in E, P and Ambient...
+            //Remember that we are going to loose all caps in E, P and Ambient
             if(setgid(group_id) || setuid(user_id)){
                 perror("Unable to change user id or group id");
                 goto free_rscs;
@@ -171,8 +171,7 @@ int main(int argc, char *argv[])
 	    print_debug_resume();
 	    #endif
         
-        //Execute temporary sr aux with the following arguments:
-        //np-root, caps, command
+        //Execute temporary sr_aux
         //The call should never return
         if (call_sr_aux(sr_aux_filepath, urc, args.noroot)){
             perror("Unable to execute sr_aux");
@@ -274,7 +273,7 @@ static int parse_arg(int argc, char **argv, arguments_t *args){
         if(strlen(args->user) > 32) return -2;
     }
     if(args->command != NULL){
-        if(strlen(args->role) > 256) return -2;
+        if(strlen(args->command) > 256) return -2;
     }
     return 0;
 }
@@ -291,7 +290,7 @@ static void print_help(int long_help){
         printf(" -c, --command=command  launch the command instead of a bash shell.\n");
         printf(" -n, --no-root          execute the bash or the command without the possibility to increase privilege (e.g.: sudo).\n");
         printf(" -u, --user=user        substitue the user (reserved to administrators).\n");
-        printf(" -i, --info             print the command the user is able to process within the role and quit.\n");
+        printf(" -i, --info             print the commands the user is able to process within the role and quit.\n");
         printf(" -h, --help             print this help and quit.\n");
     }
 }
@@ -415,7 +414,7 @@ static user_role_capabilities_t *retrieve_urc(const char* role,
         goto free_on_error;
     }
     
-    //Retrieve the user capabilities from role (depending of the command)
+    //Retrieve the user capabilities from role
 	if(init_urc_command(role, command, user, nb_groups, groups_names, &urc)){
         perror("Unable to init user role capabilities\n");
         goto free_on_error;
@@ -470,7 +469,7 @@ static user_role_capabilities_t *retrieve_urc(const char* role,
         }
         free(groups_names);
     }
-    return urc;;
+    return urc;
 }
 
 /*
