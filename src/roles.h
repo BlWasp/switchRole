@@ -10,7 +10,7 @@
 #include "sr_constants.h"
 #include <sys/capability.h>
 
-#define USER_CAP_FILE_ROLE	"/etc/security/capabilityRole.conf"
+#define USER_CAP_FILE_ROLE	"/etc/security/capabilityRole.xml"
 
 /* list of capabilities structure */
 typedef struct s_role_capabilities_t {
@@ -56,20 +56,36 @@ Always return 0.
 int free_urc(user_role_capabilities_t *urc);
 
 /*
-Remove command from urc
-This function will be discarded in the new version of config file (xml)
-Always return 0;
-*/
-int remove_urc_command(user_role_capabilities_t *urc);
-
-/* 
-Given a initialized user_role_capabilities_t, read the 
-capabilityRoles configuration file and fill the structure with the 
-matching capabilities.
-Return 0 on success, -1 on failure (among them, no matching
-capabilities have been found in the configuration file).
+Given an urc (user/groups-role-command), check in the configuration if the
+role can be used with that user or these groups (and the given command if
+require). If true, set the capabilities provided by the role in the urc.
+return :
+0: success
+-2 (EINVAL): missing mandatory parameter (either role or user)
+-3 (ENOENT): missing configuration file
+-4 (EINVAL): the configuration file is invalid
+-5 (EINVAL): the role does not exists
+-6 (EACCES): the role cannot be use with that user or his groups or with 
+that command
+-1 other error (errno will be set)
 */
 int get_capabilities(user_role_capabilities_t *urc);
+
+/*
+Given an urc (user/groups-role), print if he/she can use the role 
+(whatever the command is in urc). In this case, and if needed, 
+also print the commands he/she can use with that role.
+return :
+0: success
+-2 (EINVAL): missing mandatory parameter (either role or user)
+-3 (ENOENT): missing configuration file
+-4 (EINVAL): the configuration file is invalid
+-5 (EINVAL): the role does not exists
+-6 (EACCES): the role cannot be use with that user or his groups or with 
+that command
+-1 other error (errno will be set)
+*/
+int print_capabilities(user_role_capabilities_t *urc);
 
 /* 
 Printout on stdout a user_role_capabilities_t
