@@ -19,6 +19,26 @@
 #include <sys/prctl.h>
 #include <signal.h>
 #include <libxml/parser.h>
+#include <getopt.h>
+
+extern char *optarg;
+extern int optind, opterr, optopt;
+
+//Internal structure of input parameters
+typedef struct _arguments_t {
+    char *role;
+    char *user;
+    char *command;
+    int noroot;
+    int info;
+    int help;
+} arguments_t;
+
+/*
+Parse input arguments and check arguments validity (in length)
+return 0 on success, -1 on unknown arguments, -2 on invalid argument
+*/
+static int parse_arg(int argc, char **argv, arguments_t *args);
 
 /*
 Print Help message
@@ -65,12 +85,7 @@ Entry point
 int main(int argc, char *argv[])
 {
     int return_code = EXIT_FAILURE;
-    int i; //A multi-purpose variable
-    char *role = NULL; //the role to use
-    char *user = NULL; //the user to use
-    char *command = NULL; //the command to execute
-    int noroot = 0; //the no-root indicator
-    int print_urc_info; //option indicator to print role info and quit
+    arguments_t args; //The input args
     uid_t user_id; //the user id that will be used
     gid_t group_id; //the user group Id that will be used
     int change_user_required; //a indicator that we need to change user
@@ -79,38 +94,17 @@ int main(int argc, char *argv[])
     int idfork; //The id of the forked process
 
 	// Parse and validate arguments
-	for (i=1; i<argc; i++) {
-		if (!strcmp(argv[i], "-r")) {
-			role = argv[++i];
-			continue;
-		}
-		if (!strcmp(argv[i], "-u")) {
-			user = argv[++i];
-			continue;
-		}
-		if (!strcmp(argv[i], "-c")) {
-			command = argv[++i];
-			continue;
-		}
-		if (!strcmp(argv[i], "-n")){
-			noroot = 1;
-			continue;
-        }
-        if(!strcmp(argv[i], "-i")){
-            print_urc_info = 1;
-            continue;
-        }
-		if (!strcmp(argv[i],"-h")) {
-			print_help(1);
-			exit(EXIT_SUCCESS);
-		}
-		//At this point: wrong parameter
-		fprintf(stderr, "Bad parameter\n");
+	if(parse_arg(argc, argv, &args)){
+	    fprintf(stderr, "Bad parameter.\n");
 		print_help(0);
         goto free_rscs;
 	}
+	if(args.help){
+	    print_help(1);
+		exit(EXIT_SUCCESS);
+	}
     //Assert a role has been given
-	if (role == NULL){
+	if (args.role == NULL){
         fprintf(stderr, "A role is mandatory\n");
 		print_help(0);
         goto free_rscs;
@@ -124,29 +118,29 @@ int main(int argc, char *argv[])
 	//If a user has been given, check if the current process has the
 	//capabilities to set uid or gid, then retrieve the user's id
 	//user will have to be dealloced afterwards
-	if(verify_user(&user, &user_id, &group_id, 
+	if(verify_user(&args.user, &user_id, &group_id, 
 	                &change_user_required)) goto free_rscs;
 	
 	//Prevention of execution if user is root and no-root is not active
-	if(user_id == 0 && noroot == 0){
+	if(user_id == 0 && args.noroot == 0){
 	    fprintf(stderr, "For security reason, you cannot execute a role under root. Please change the user or use the no-root option\n");
 	    goto free_rscs;
 	}
 	
 	//Retrieve the user capabilities from role (depending of the command)
 	//Print role info if print_urc_info == 1
-	if((urc = retrieve_urc(role, user, command, user_id, group_id, 
-	                        print_urc_info)) == NULL){
+	if((urc = retrieve_urc(args.role, args.user, args.command, user_id, 
+	                    group_id, args.info)) == NULL){
         goto free_rscs;
     }
-	if(print_urc_info){
+	if(args.info){
 	    //Quit here
 	    return_code = EXIT_SUCCESS;
 	    goto free_rscs;
 	}
 
 	//Create a temporary sr_aux with the given capabilities
-	if((sr_aux_filepath = create_sr_aux_temp(user, urc, 
+	if((sr_aux_filepath = create_sr_aux_temp(args.user, urc, 
 	                           change_user_required)) == NULL){
         perror("Unable to create temporary sr_aux file");
         goto free_rscs;
@@ -157,7 +151,7 @@ int main(int argc, char *argv[])
 	if (idfork == 0){ //Child work
 	    //if no-root option is required, activates securebits
 	    //We must activates securebits before changing uid !
-        if(noroot){
+        if(args.noroot){
             if(activates_securebits()){
                 perror("Unable to activate securebits for no-root option");
                 goto free_rscs;
@@ -180,7 +174,7 @@ int main(int argc, char *argv[])
         //Execute temporary sr aux with the following arguments:
         //np-root, caps, command
         //The call should never return
-        if (call_sr_aux(sr_aux_filepath, urc, noroot)){
+        if (call_sr_aux(sr_aux_filepath, urc, args.noroot)){
             perror("Unable to execute sr_aux");
             goto free_rscs;
         }
@@ -201,7 +195,7 @@ int main(int argc, char *argv[])
             return_code = EXIT_SUCCESS;
         }
         //delete the sr_aux temporary file
-        printf("End of role %s session.\n", role);
+        printf("End of role %s session.\n", args.role);
         if(remove(sr_aux_filepath)){
             perror("Error while deleting temporary sr_aux file");
             return_code = EXIT_FAILURE;
@@ -213,8 +207,8 @@ int main(int argc, char *argv[])
     if(urc != NULL){
         free_urc(urc);
     }
-    if(user != NULL){
-        free(user);
+    if(args.user != NULL){
+        free(args.user);
     }
     if(sr_aux_filepath != NULL){
         free(sr_aux_filepath);
@@ -223,17 +217,82 @@ int main(int argc, char *argv[])
 }
 
 /*
+Parse input arguments and check arguments validity (in length)
+return 0 on success, -1 on unknown arguments, -2 on invalid argument
+*/
+static int parse_arg(int argc, char **argv, arguments_t *args){
+    *args = (arguments_t) {NULL, NULL, NULL, 0, 0, 0};
+    
+    while(1){
+        int option_index = 0;
+        int c;
+        static struct option long_options[] = {
+            {"role",    required_argument, 0,   'r'},
+            {"user",    required_argument, 0,   'u'},
+            {"command", required_argument, 0,   'c'},
+            {"no-root", no_argument,       0,   'n'},
+            {"info",    no_argument,       0,   'i'},
+            {"help",    no_argument,       0,   'h'},
+            {0,         0,                 0,   0}
+        };
+
+        c = getopt_long(argc, argv, "r:u:c:nih", long_options, &option_index);
+        if(c == -1) break;
+    
+        switch(c){
+            case 'r':
+                args->role = optarg;
+                break;
+            case 'u':
+                args->user = optarg;
+                break;
+            case 'c':
+                args->command = optarg;
+                break;
+            case 'n':
+                args->noroot = 1;
+                break;
+            case 'i':
+                args->info = 1;
+                break;
+            case 'h':
+                args->help = 1;
+                break;
+            default:
+                return -1;
+        }
+    }
+    //If other unknown args
+    if (optind < argc) {
+        return -1;
+    }
+    //Check length of string
+    if(args->role != NULL){
+        if(strlen(args->role) > 64) return -2;
+    }
+    if(args->user != NULL){
+        if(strlen(args->user) > 32) return -2;
+    }
+    if(args->command != NULL){
+        if(strlen(args->role) > 256) return -2;
+    }
+    return 0;
+}
+
+/*
 Print Help message
 */
 static void print_help(int long_help){
     printf("Usage : sr -r role [-n] [-c command] [-u user] [-h]\n");
     if (long_help){
-        printf("\n\t-r role: provide the capabilities given to the role.\n");
-        printf("\t-n: execute the bash or the command without the possibility to increase privilege (e.g.: sudo).\n");
-        printf("\t-c command: launch the command instead of a bash shell.\n");
-        printf("\t-u user: substitue the user (reserved to administrators).\n");
-        printf("\t-i: print the command the user is able to process within the role and quit.\n");
-        printf("\t-h: print this help and quit.\n");
+        printf("Use a role to provide capabilities to a shell or a command.\n");
+        printf("Options:\n");
+        printf(" -r, --role=role        the capabilities role to use.\n");
+        printf(" -c, --command=command  launch the command instead of a bash shell.\n");
+        printf(" -n, --no-root          execute the bash or the command without the possibility to increase privilege (e.g.: sudo).\n");
+        printf(" -u, --user=user        substitue the user (reserved to administrators).\n");
+        printf(" -i, --info             print the command the user is able to process within the role and quit.\n");
+        printf(" -h, --help             print this help and quit.\n");
     }
 }
 
