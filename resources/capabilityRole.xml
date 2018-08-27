@@ -17,6 +17,20 @@
 ]>
 <capabilityrole>
 	<roles>
+	<!--	<role name="root">
+ 			<capabilities>
+ 				<capability>cap_net_raw</capability>
+ 				<capability>cap_sys_nice</capability>
+ 			</capabilities>
+ 			<users>
+ 				<user name="Put User Name Here"/>
+ 			</users>
+ 			<groups>
+ 				<group name="Put Group Name Here"/>
+ 			</groups>
+ 		</role>
+		
+		
 		<role name="role1">
 			<capabilities>
 				<capability>cap_net_raw</capability>
@@ -57,5 +71,6 @@
 				</group>
 			</groups>
 		</role>
+	-->
 	</roles>
 </capabilityrole>
