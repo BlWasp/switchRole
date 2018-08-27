@@ -96,7 +96,8 @@ static int check_urc_valid_for_role(user_role_capabilities_t *urc,
 Find a user node that match user in a role_node, and whose command given
 (or not) match the auhtorized command if needed.
 Return 0 on success, -2 if no valid user have been found, -3 if an error
-has been found in the xml doc, -1 if an other error happened.
+has been found in the xml doc, -4 if a user has been found but command invalid,
+-1 if an other error happened.
 */
 static int find_matching_user_node(user_role_capabilities_t *urc, 
         const xmlNodePtr role_node);
@@ -418,7 +419,7 @@ int print_capabilities(user_role_capabilities_t *urc){
     int parser_options;
     xmlDocPtr conf_doc = NULL; // the configuration xml document tree
     xmlNodePtr role_node = NULL; //The role xml node
-    int no_user, no_group; //user or group not found
+    int no_user; //user not found
     int any_user_command, any_group_command = 0;
     chained_commands commands_list = NULL; //The list of command
     
@@ -485,26 +486,25 @@ int print_capabilities(user_role_capabilities_t *urc){
             return_code = -4;
             goto free_rscs;
     }
-    //Add commands to the list form groups
-    ret_fct = add_groups_commands(urc, role_node, &any_group_command, 
-                                    &commands_list);
-    switch(ret_fct){
-        case 0:
-            no_group = 0;
-            break;
-        case -2:
-            no_group = 1;
-            break;
-        default:
-            errno = EINVAL;
-            return_code = -4;
-            goto free_rscs;
-    }
-    //If no user and no group match, return error
-    if(no_user && no_group){
-        errno = EACCES;
-        return_code = -6;
-        goto free_rscs;
+    //If user was not defined for the role, load group command definition
+    if(no_user){
+        //Add commands to the list form groups
+        ret_fct = add_groups_commands(urc, role_node, &any_group_command, 
+                                        &commands_list);
+        switch(ret_fct){
+            case 0:
+                break;
+            case -2:
+                //no user and no group were found, return error
+                errno = EACCES;
+                return_code = -6;
+                goto free_rscs;
+            default:
+                errno = EINVAL;
+                return_code = -4;
+                goto free_rscs;
+        }
+        
     }
     //Printout
     if(any_user_command || any_group_command){
@@ -780,19 +780,23 @@ static int check_urc_valid_for_role(user_role_capabilities_t *urc,
     
     //Try to find a matching user node
     return_fct = find_matching_user_node(urc, role_node);
-    if(return_fct == -2){ //no matching user
-        //try to find a matching group node
-        return_fct = find_matching_group_node(urc, role_node);
-    }
-    //As all 2 sub function share the same return code semantic, return it
-    return return_fct;		
+    switch(return_fct){
+        case -4: //user found, invalid command
+            return -2;
+        case -2: //no user found
+            //find matching group node
+            return find_matching_group_node(urc, role_node);
+        default:
+            return return_fct;
+    }	
 }
 
 /*
 Find a user node that match user in a role_node, and whose command given
 (or not) match the auhtorized command if needed.
-Return 0 on success, -2 if no valid user have been found, -3 if an error
-has been found in the xml doc, -1 if an other error happened.
+Return 0 on success, -2 if no user have been found, -3 if an error
+has been found in the xml doc, -4 if a user has been found but command invalid
+-1 if an other error happened.
 */
 static int find_matching_user_node(user_role_capabilities_t *urc, 
         const xmlNodePtr role_node){
@@ -830,7 +834,10 @@ static int find_matching_user_node(user_role_capabilities_t *urc,
     //already set with check_valid_command
     if(!user_found){
         return_code = -2;
-    }
+    }else if(return_code == -2){ //user found but command invalid
+        return_code = -4;
+    }//else nothing to do, return_code 0 or -1 already set by 
+    //check_valid_command
     
   free_rscs:	
     if(it_node != NULL) xci_free_it(it_node);
