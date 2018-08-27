@@ -72,8 +72,8 @@
 				<capability>cap_sys_nice</capability>
 			</capabilities>
 			<users>
-				<user name="guillaume"/>
-				<user name="remi">
+				<user name="Put User Name Here"/>
+				<user name="Put User Name Here">
 					<commands>
 						<command>/usr/sbin/tcpdump</command>
 						<command>/usr/sbin/iptables</command>
@@ -81,9 +81,9 @@
 				</user>
 			</users>
 			<groups>
-				<group name="adm"/>
-				<group name="office"/>
-				<group name="secretary">
+				<group name="Put Group Name Here"/>
+				<group name="Put Group Name Here"/>
+				<group name="Put Group Name Here">
 					<commands>
 						<command>/usr/bin/printer</command>
 						<command>/usr/bin/other</command>
@@ -97,7 +97,7 @@
 				<capability>cap_setuid</capability>
 			</capabilities>
 			<groups>
-				<group name="adm">
+				<group name=""Put Group Name Here"">
 					<commands>
 						<command>/usr/bin/passwd</command>
 						<command>/usr/bin/chmod</command>
