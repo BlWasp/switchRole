@@ -19,8 +19,6 @@
 	<roles>
 	<!--	<role name="root">
  			<capabilities>
- 				<capability>cap_net_raw</capability>
- 				<capability>cap_sys_nice</capability>
 				<capability>cap_chown</capability>
 				<capability>cap_dac_override</capability>
 				<capability>cap_dac_read_search</capability>
