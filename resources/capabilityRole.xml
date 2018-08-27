@@ -97,7 +97,7 @@
 				<capability>cap_setuid</capability>
 			</capabilities>
 			<groups>
-				<group name=""Put Group Name Here"">
+				<group name="Put Group Name Here">
 					<commands>
 						<command>/usr/bin/passwd</command>
 						<command>/usr/bin/chmod</command>
