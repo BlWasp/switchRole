@@ -1003,15 +1003,17 @@ static int complete_role_capabilities(user_role_capabilities_t *urc,
     int *capability_dict = NULL; //An array where index represent capabilities 
                         //and value if it is defined or not
     size_t i,k;
+    int early_cap_stop; //indicator to stop looking for caps if "*" have been found
+    xmlChar *all_cap_token = NULL;
                         
-    
     //Init output params
     urc->caps.nb_caps = 0;
     urc->caps.capabilities = NULL;
     
     //Init iterator
     if((it_node = new_xml_collection_iterator(role_node, 
-                        "capabilities", "capability")) == NULL){
+                        "capabilities", "capability")) == NULL
+        ||(all_cap_token = xmlCharStrdup("*")) == NULL){
         goto free_on_error;
     }
     //If no commands node: accepted (no caps) return 0
@@ -1025,21 +1027,32 @@ static int complete_role_capabilities(user_role_capabilities_t *urc,
         goto free_on_error;
     }
     //Iterate over capability node in the capabilities node
-    while(xci_has_next(it_node)){
+    //Stop if all cap token has been found
+    early_cap_stop = 0;
+    while(xci_has_next(it_node) && !early_cap_stop){
         xmlNodePtr cur_node = xci_next(it_node);
         xmlNodePtr textNode;
-        for(textNode = cur_node->children; textNode != NULL; 
+        for(textNode = cur_node->children; textNode != NULL && !early_cap_stop; 
                 textNode = textNode->next){
             if(xmlNodeIsText(textNode)){
                 xmlChar *cap_text = xmlNodeGetContent(textNode);
                 cap_value_t cap_val;
-                //Attempt to convert cap_text to cap_value
-                //WARNING : cast should be safe so far..
-                if(cap_from_name((char *)cap_text, &cap_val)){
-                    fprintf(stderr, "Warning: capability '%s' not handled by the system\n", cap_text);
+                //If cap_text is '*', the load all available caps
+                if(xmlStrEqual(all_cap_token, cap_text)){
+                    for(i = 0; i <= CAP_LAST_CAP; i++){
+                        capability_dict[i] = 1;
+                    }
+                    //will stop looping as all caps have been set
+                    early_cap_stop = 1;
                 }else{
-                    //Set the cap in the dict to 1
-                    capability_dict[cap_val] = 1;
+                    //Attempt to convert cap_text to cap_value
+                    //WARNING : cast should be safe so far..
+                    if(cap_from_name((char *)cap_text, &cap_val)){
+                        fprintf(stderr, "Warning: capability '%s' not handled by the system\n", cap_text);
+                    }else{
+                        //Set the cap in the dict to 1
+                        capability_dict[cap_val] = 1;
+                    }
                 }
                 free(cap_text);
             }
@@ -1072,6 +1085,7 @@ static int complete_role_capabilities(user_role_capabilities_t *urc,
   free_rscs: //Free resources on success or failure
     if(it_node != NULL) xci_free_it(it_node);
     if(capability_dict != NULL) free(capability_dict);
+    if(all_cap_token != NULL) free(all_cap_token);
     return return_code;										
 }
 

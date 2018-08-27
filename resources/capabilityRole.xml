@@ -19,43 +19,7 @@
 	<roles>
 		<role name="root">
  			<capabilities>
-				<capability>cap_chown</capability>
-				<capability>cap_dac_override</capability>
-				<capability>cap_dac_read_search</capability>
-				<capability>cap_fowner</capability>
-				<capability>cap_fsetid</capability>
-				<capability>cap_kill</capability>
-				<capability>cap_setgid</capability>
-				<capability>cap_setuid</capability>
-				<capability>cap_setpcap</capability>
-				<capability>cap_linux_immutable</capability>
-				<capability>cap_net_bind_service</capability>
-				<capability>cap_net_broadcast</capability>
-				<capability>cap_net_admin</capability>
-				<capability>cap_net_raw</capability>
-				<capability>cap_ipc_lock</capability>
-				<capability>cap_ipc_owner</capability>
-				<capability>cap_sys_module</capability>
-				<capability>cap_sys_rawio</capability>
-				<capability>cap_sys_chroot</capability>
-				<capability>cap_sys_ptrace</capability>
-				<capability>cap_sys_pacct</capability>
-				<capability>cap_sys_admin</capability>
-				<capability>cap_sys_boot</capability>
-				<capability>cap_sys_nice</capability>
-				<capability>cap_sys_resource</capability>
-				<capability>cap_sys_time</capability>
-				<capability>cap_sys_tty_config</capability>
-				<capability>cap_mknod,cap_lease</capability>
-				<capability>cap_audit_write</capability>
-				<capability>cap_audit_control</capability>
-				<capability>cap_setfcap</capability>
-				<capability>cap_mac_override</capability>
-				<capability>cap_mac_admin</capability>
-				<capability>cap_syslog</capability>
-				<capability>cap_wake_alarm</capability>
-				<capability>cap_block_suspend</capability>
-				<capability>cap_audit_read</capability>
+				<capability>*</capability>
  			</capabilities>
  			<users>
  				<user name="ROOTADMINISTRATOR"/>
