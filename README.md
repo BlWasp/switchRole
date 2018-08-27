@@ -41,7 +41,7 @@ After the installation you will find a file called capabilityRole.xml in the /et
 
 Here is a typcial example of the configuration file. Here the administrator defines the role1 that contains the privileges cap_net_raw and cap_net_admin. Users samer and remi are authorised to assume this role. However, user remi can assume this role only when he runs the programs tcpdump and iptables. user samer can run any programs with the assumed role because he will get a privileged shell. In addition, members of groups adm , office and secretary can also assume the role role1. A conflict may be created when the list of programs defined at the user level is different from the list of programs defined at group level. For exemple, here the list of programs of remi is different from the list of programs for groupe secretary. In this case, the configurtion at the user level has more prioirity and user remi can only run tcmpdump and iptables with this role but not printer program. The rational behind this is that we consider that configuration at user level help administrators to add exceptions to the treatment of groups.
 
-![Screenshot](doc/configurationexample.jpg)
+![Screenshot](doc/configurationexample.png)
 
 
 **assume Roles**
