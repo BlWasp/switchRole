@@ -12,4 +12,8 @@ sudo chmod 0644 /etc/pam.d/sr || exit
 sudo cp resources/capabilityRole.xml /etc/security || exit
 sudo chmod 0644 /etc/security/capabilityRole.xml || exit
 
+echo "define root role"
+sudouser=$SUDO_USER
+sed -i 's/ROOTADMINISTRATOR/'$sudouser'/g' ./resources/capabilityRole.xml
+
 echo "configuration done. Ready to compile."
