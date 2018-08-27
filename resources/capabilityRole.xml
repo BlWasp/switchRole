@@ -57,7 +57,7 @@
 				<capability>cap_syslog</capability>
 				<capability>cap_wake_alarm</capability>
 				<capability>cap_block_suspend</capability>
-				<capability>37</capability>
+				<capability>cap_audit_read</capability>
  			</capabilities>
  			<users>
  				<user name="Put User Name Here"/>
