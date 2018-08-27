@@ -44,9 +44,9 @@ After the installation you will find a file called capabilityRole.conf in the /e
  The role root is defined by default with the list of all privileges. To assume the role Root, type in your shell the following command :
 `sr -r root` 
 
-After that a new shell is openned. This shell contains the capabilities of the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you make an exit() you retrun to your initial shell without any privilege.
+After that a new shell is openned. This shell contains the capabilities of the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you make an exit() you return to your initial shell without any privilege.
 
-Of course, other roles can be defined by modifying the capabilityRole.conf, you can also limit the utilisation of some roles to certain programs. In this case, you can assume a role for executing one program by adding the "-c" option. For example:
+Of course, other roles can be defined by modifying the capabilityRole.xml, you can also limit the utilisation of some roles to certain programs. In this case, you can assume a role for executing one program by adding the "-c" option. For example:
 
 `sr -r role1 -c /bin/tcpdump`
 
@@ -59,7 +59,7 @@ You have the possibility to launch a full capabale shell that doesn't give any s
 We use the securebits to provide this functionality. Any set-uid-root program will be run without having any special effect. So in the shell, you can't for example use the ping command without a role that has cap_net_raw privilege.
 
 
-Motivation scenarios
+Why our module is better than setcap and pam_cap.so
 ===========
 
 Scenario 1
