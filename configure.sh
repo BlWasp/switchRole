@@ -6,7 +6,7 @@ apt-get install libcap2 libcap2-bin libcap-dev libcap-ng-dev || exit
 apt-get install libpam0g-dev || exit
 apt-get install libxml2 libxml2-dev || exit
 
-echo "define root role for"
+echo "define root role for:"
 echo $SUDO_USER
 sudouser=$SUDO_USER
 sed -i 's/ROOTADMINISTRATOR/'$sudouser'/g' ./resources/capabilityRole.xml
