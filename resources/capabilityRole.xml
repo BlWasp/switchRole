@@ -17,7 +17,7 @@
 ]>
 <capabilityrole>
 	<roles>
-	<!--	<role name="root">
+		<role name="root">
  			<capabilities>
 				<capability>cap_chown</capability>
 				<capability>cap_dac_override</capability>
@@ -58,14 +58,11 @@
 				<capability>cap_audit_read</capability>
  			</capabilities>
  			<users>
- 				<user name="Put User Name Here"/>
+ 				<user name="ROOTADMINISTRATOR"/>
  			</users>
- 			<groups>
- 				<group name="Put Group Name Here"/>
- 			</groups>
  		</role>
 		
-		
+	<!--	
 		<role name="role1">
 			<capabilities>
 				<capability>cap_net_raw</capability>
