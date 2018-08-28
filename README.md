@@ -89,7 +89,7 @@ A user can know the list of commands that he can use with a role by adding the i
 
 Here user awazan can use with role1 the commands tcpdump and iptables.
 
-![Screenshot](doc/asssumerole11111.png)
+![Screenshot](doc/assumerole11111.png)
 
 
 
