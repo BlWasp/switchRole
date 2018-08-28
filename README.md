@@ -72,6 +72,16 @@ In this case, we designed our module to give the most generous decision. So in t
 
 ![Screenshot](doc/assumerole111.png)
 
+Finally we can suspend users can be suspended from assuming roles by adding an empty commands attributes. For example, here we suspend the user awazan from assuming the role role1.
+
+![Screenshot](doc/configurationexample5.png)
+
+As you may notice, the user awazan is not able to assume role1.
+
+![Screenshot](doc/assumerole1111.png)
+
+
+
 
 
 **No Root mode**
