@@ -39,17 +39,26 @@ Usage
 
 After the installation you will find a file called capabilityRole.xml in the /etc/security directory. You should configure this file in order to define the set of roles and assign them to users or group of users on your system. Once configuration is done, a user can assume a role using the ‘sr’ tool  that is installed with our package.
 
-Here is a typcial example of the configuration file. Here the administrator defines the role1 that contains the privileges cap_net_raw and cap_sys_nice. Users samer and remi are authorised to assume this role. However, user remi can assume this role only when he runs the programs tcpdump and iptables. user samer can run any programs with the assumed role because he will get a privileged shell. In addition, members of groups adm , office and secretary can also assume the role role1. A conflict may be created when the list of programs defined at the user level is different from the list of programs defined at group level. For exemple, here the list of programs of remi is different from the list of programs for the group secretary that belongs to remi's groups. In this case, the configurtion at the user level has more prioirity and user remi can only run tcpdump and iptables with this role but not printer program. The rational behind this is that we consider that configuration at user level help administrators to add exceptions to the treatment of groups.
-
-![Screenshot](doc/configurationexample2.png)
-
-
-**assume Roles**
-
- The role root is defined by default with the list of all privileges. To assume the role Root, type in your shell the following command :
+To edit the configuration file you must first assume the root role using the sr tool. The role root is defined by default with the list of all privileges. To assume the role Root, type in your shell the following command :
 `sr -r root` 
 
 After that a new shell is openned. This shell contains the capabilities of the role that has been taken by the user. You can verify by reading the capabilities of your shell (cat /proc/$$/status). When you make an exit() you return to your initial shell without any privilege.
+
+Here is a typcial example of the configuration file. Here the administrator defines the role1 that contains the privileges cap_net_raw and cap_sys_nice. Users samer and remi are authorised to assume this role. However, user remi can assume this role only when he runs the programs tcpdump and iptables. user samer can run any programs with the assumed role because he will get a privileged shell. In addition, members of groups adm , office and secretary can also assume the role role1. 
+
+![Screenshot](doc/configurationexample2.png)
+
+As you may note, here the user awazan has got a shell with privileged cap_net_raw and cap_sys_nice are activated.
+![Screenshot](doc/assumerole1.png)
+
+
+**Conflictual Situations**
+
+A conflict may be created when the list of programs defined at the user level is different from the list of programs defined at group level. For exemple, here the list of programs of remi is different from the list of programs for the group secretary that belongs to remi's groups. In this case, the configurtion at the user level has more prioirity and user remi can only run tcpdump and iptables with this role but not printer program. The rational behind this is that we consider that configuration at user level help administrators to add exceptions to the treatment of groups.
+
+**assume Roles**
+
+ 
 
 Of course, other roles can be defined by modifying the capabilityRole.xml, you can also limit the utilisation of some roles to certain programs. In this case, you can assume a role for executing one program by adding the "-c" option. For example:
 
