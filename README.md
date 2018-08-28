@@ -64,6 +64,14 @@ User awazan is member of adm group. So here we have conflitual situation because
 
 ![Screenshot](doc/assumerole11.png)
 
+Another conflictual situation can be created between groups. For example, we have edited the configuration file to allow the members of groups adm, awazan and secretary to assume the role role1. No configuration is defined for user awazan. However, user awazan belongs to groups adm and awazan that have conflictual configurations. 
+
+![Screenshot](doc/configurationexample4.png)
+
+In this case, we designed our module to give the most generous decision. So in this case, the user awazan will get a privileged shell.
+
+![Screenshot](doc/assumerole111.png)
+
 
 
 **No Root mode**
