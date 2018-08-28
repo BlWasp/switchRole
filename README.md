@@ -56,13 +56,15 @@ As you may note, here the user awazan has got a shell with privileged cap_net_ra
 
 A conflict may be created when the list of programs defined at the user level is different from the list of programs defined at group level. For exemple, here the list of programs of remi is different from the list of programs for the group secretary that belongs to remi's groups. In this case, the configurtion at the user level has more prioirity and user remi can only run tcpdump and iptables with this role but not printer program. The rational behind this is that we consider that configuration at user level help administrators to add exceptions to the treatment of groups.
 
-**assume Roles**
+For example, suppose that we have edited our configuration file as following:
 
- 
+![Screenshot](doc/configurationexample3.png)
 
-Of course, other roles can be defined by modifying the capabilityRole.xml, you can also limit the utilisation of some roles to certain programs. In this case, you can assume a role for executing one program by adding the "-c" option. For example:
+User awazan is member of adm group. So here we have conflitual situation because user awazan can run only tcpdump with this role, whereas his group allows him to have a privileged shell. As explained before, we give more priority to configuration of the user awazan. So in this case user awazan will be only able to run tcpdump, although that the other members of his group will be able to have a privileged shell.
 
-`sr -r role1 -c /bin/tcpdump`
+![Screenshot](doc/assumerole11.png)
+
+
 
 **No Root mode**
 
