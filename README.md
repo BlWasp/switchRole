@@ -81,6 +81,14 @@ As you may notice, the user awazan is not able to assume role1.
 ![Screenshot](doc/assumerole1111.png)
 
 
+**available commands**
+A user can know the list of commands that he can use with a role by adding the i option. For example, here the user awazan uses the i option to know the list of commands he can use with the role role1.
+
+![Screenshot](doc/configurationexample6.png)
+
+Here user awazan can use with role1 the commands tcpdump and iptables.
+
+![Screenshot](doc/asssumerole11111.png)
 
 
 
