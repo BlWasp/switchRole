@@ -95,11 +95,40 @@ Here user awazan can use with role1 the commands tcpdump and iptables.
 
 **No Root mode**
 
-You have the possibility to launch a full capabale shell that doesn't give any special treatment to uid 0. The root user is considered as any other normal user and you can in this case grant him a few privileges in the capabilityRole.conf distributed by our module :
+You have the possibility to launch a full capabale shell that doesn't give any special treatment to uid 0. The root user is considered as any other normal user and you can in this case grant him a few privileges in the capabilityRole.xml distributed by our module :
 
 `sr -n -r role1`
 
 We use the securebits to provide this functionality. Any set-uid-root program will be run without having any special effect. So in the shell, you can't for example use the ping command without a role that has cap_net_raw privilege.
+
+For example, when we launch the sr tool with the root user but without the option -n : 
+
+![Screenshot](doc/scenarioNoRoot/rootWithoutNoroot.png)
+
+as you see, the root user obtains the full list of privileges.
+
+Here is the result when we add the -n option : 
+
+![Screenshot](doc/scenarioNoRoot/rootNorootRole1.png)
+
+As you see now, the root user didn't obtain the full list of privileges.
+
+Under this mode, set-uid-root programs will not have the full list of privileges and they can not be launched.
+
+For example, lets check the result of the ping program. Suppose that we assign the role2 to root user as follows:
+
+![Screenshot](doc/scenarioNoRoot/rootConfRole2.png)
+
+When the root user assume the role2 with -n option, he can't use `ping 0` because cap_net_raw is not present its role.
+
+![Screenshot](doc/scenarioNoRoot/rootRole2NoRootCantPing.png)
+
+If we modify the configuration to assign role1 that conains cap_net_raw privilege to root user, we see that he can now use ping:
+
+![Screenshot](doc/scenarioNoRoot/rootConfRole1.png)
+
+
+![Screenshot](doc/scenarioNoRoot/rootRole1NoRootPing.png).
 
 
 Why our module is better than setcap and pam_cap.so
@@ -198,39 +227,6 @@ Scenario 4
 Two developers create a shared folder in which they stored a common program that they develop together. This program requires cap_net_raw privilege. The developers have to mount their shared folder using NFS v3.  This scenario is not feasible with the current tools because NFS v3 doesn’t support extended attributes. 
 
 
-
-NoRoot Scenario 
------
-With -n option the kernel considers the root user as any normal user. 
-
-Here, the sr tool is launched with the root user but without -n : 
-
-![Screenshot](doc/scenarioNoRoot/rootWithoutNoroot.png)
-
-as you see, the root user obtains the full list of privileges.
-
-Here is the result when we add the -noroot option : 
-
-![Screenshot](doc/scenarioNoRoot/rootNorootRole1.png)
-
-As you see now, the root user didn't obtain the full list of privileges.
-
-Under this mode, set-uid-root programs will not have the full list of privileges and they can not be launched.
-
-For example, lets check result of the ping program. Suppose that we assign the role2 to root user as follows:
-
-![Screenshot](doc/scenarioNoRoot/rootConfRole2.png)
-
-When the root user assume the role2 with -noroot option, he can't use `ping 0` because cap_net_raw is not present its role.
-
-![Screenshot](doc/scenarioNoRoot/rootRole2NoRootCantPing.png)
-
-If we modify the configuration to assign role1 that conains cap_net_raw privilege to root user, we see that he can now use ping:
-
-![Screenshot](doc/scenarioNoRoot/rootConfRole1.png)
-
-
-![Screenshot](doc/scenarioNoRoot/rootRole1NoRootPing.png).
 
 Service Managment Scenario 
 -----
