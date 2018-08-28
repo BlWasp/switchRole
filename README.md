@@ -130,6 +130,10 @@ If we modify the configuration to assign role1 that conains cap_net_raw privileg
 
 ![Screenshot](doc/scenarioNoRoot/rootRole1NoRootPing.png).
 
+Why our module is better than sudo, su and setuid-root programs
+===========
+Sudo, su and setuid-root bit allows programs to run with the full list of root privileges. Here we give an example for removing the bit s from passwd program.
+
 
 Why our module is better than setcap and pam_cap.so
 ===========
